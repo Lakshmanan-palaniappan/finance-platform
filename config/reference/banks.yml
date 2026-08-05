@@ -1,0 +1,19 @@
+bank:
+
+  name: Enterprise Bank
+
+  short_name: EB
+
+  ifsc_prefix: ENBK
+
+  swift_code: ENBKINBB
+
+currency:
+
+  base: INR
+
+supported_cards:
+
+  - Visa
+  - MasterCard
+  - RuPay

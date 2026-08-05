@@ -1,0 +1,29 @@
+branches:
+  count: 10
+
+customers:
+  count: 50
+
+accounts:
+  count: 75
+
+cards:
+  count: 60
+
+loans:
+  count: 15
+
+customer_kyc:
+  count: 50
+
+exchange_rates:
+  count: 8
+
+transactions:
+  batch_size: 100
+
+atm_transactions:
+  batch_size: 30
+
+login_activity:
+  batch_size: 40

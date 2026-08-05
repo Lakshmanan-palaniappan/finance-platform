@@ -1,0 +1,41 @@
+customers:
+
+  primary_key:
+
+    - customer_id
+
+accounts:
+
+  primary_key:
+
+    - account_id
+
+cards:
+
+  primary_key:
+
+    - card_id
+
+loans:
+
+  primary_key:
+
+    - loan_id
+
+transactions:
+
+  primary_key:
+
+    - transaction_id
+
+atm_transactions:
+
+  primary_key:
+
+    - atm_transaction_id
+
+login_activity:
+
+  primary_key:
+
+    - login_id

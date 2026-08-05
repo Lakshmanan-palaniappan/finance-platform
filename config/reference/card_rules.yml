@@ -1,0 +1,25 @@
+card_types:
+
+  Debit:
+
+    daily_limit: 100000
+
+  Credit:
+
+    daily_limit: 250000
+
+networks:
+
+  - Visa
+
+  - MasterCard
+
+  - RuPay
+
+status:
+
+  - ACTIVE
+
+  - BLOCKED
+
+  - EXPIRED

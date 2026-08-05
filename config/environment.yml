@@ -1,0 +1,271 @@
+project:
+
+  name: enterprise-banking-platform
+
+azure:
+
+  storage_account: bankingstorageacc
+
+  container: finance-dev
+
+unity_catalog:
+
+  catalog: banking
+
+  bronze_schema: bronze
+
+  silver_schema: silver
+
+  gold_schema: gold
+
+  monitoring_schema: monitoring
+
+paths:
+
+  landing: landing
+
+  master: master
+
+  cdc: cdc
+
+  streaming: streaming
+
+  bronze: bronze
+
+  silver: silver
+
+  gold: gold
+
+  checkpoints: checkpoints
+
+  schema: schema
+
+  quarantine: quarantine
+
+  archive: archive
+
+  logs: logs
+
+simulation:
+
+  master:
+
+    branches: 5
+
+    customers: 20
+
+    customer_income:
+
+      minimum: 250000
+
+      maximum: 5000000
+
+    account_balance:
+
+      maximum: 2500000
+
+    credit_card_income: 700000
+
+    loan:
+
+      income_probability:
+
+        default: 0.15
+
+        medium: 0.30
+
+        high: 0.50
+
+      interest_rate:
+
+        minimum: 7.5
+
+        maximum: 12.5
+
+  streaming:
+
+    cycle_interval: 30
+
+    transaction_batch_size: 10
+
+    atm_batch_size: 5
+
+    login_batch_size: 5
+
+    customer_events: 3
+
+    card_events: 2
+
+    loan_events: 2
+
+    fraud_probability: 0.02
+
+    failed_login_probability: 0.08
+
+    new_device_probability: 0.15
+
+    high_value_transaction: 100000
+
+    atm_high_value: 10000
+
+    atm:
+
+      minimum_amount: 100
+
+      maximum_amount: 20000
+
+datasets:
+
+  branches:
+
+    type: master
+
+    folder: branches
+
+    filename_prefix: branches
+
+    format: csv
+
+  customers:
+
+    type: master
+
+    folder: customers
+
+    filename_prefix: customers
+
+    format: csv
+
+  accounts:
+
+    type: master
+
+    folder: accounts
+
+    filename_prefix: accounts
+
+    format: csv
+
+  cards:
+
+    type: master
+
+    folder: cards
+
+    filename_prefix: cards
+
+    format: csv
+
+  loans:
+
+    type: master
+
+    folder: loans
+
+    filename_prefix: loans
+
+    format: csv
+
+  customer_kyc:
+
+    type: master
+
+    folder: customer_kyc
+
+    filename_prefix: customer_kyc
+
+    format: csv
+
+  exchange_rates:
+
+    type: master
+
+    folder: exchange_rates
+
+    filename_prefix: exchange_rates
+
+    format: csv
+
+  transactions:
+
+    type: streaming
+
+    folder: transactions
+
+    filename_prefix: transactions
+
+    format: csv
+
+  atm_transactions:
+
+    type: streaming
+
+    folder: atm_transactions
+
+    filename_prefix: atm_transactions
+
+    format: csv
+
+  login_activity:
+
+    type: streaming
+
+    folder: login_activity
+
+    filename_prefix: login_activity
+
+    format: csv
+
+  account_cdc:
+
+    type: cdc
+
+    folder: account_cdc
+
+    filename_prefix: account_cdc
+
+    format: csv
+
+  customer_cdc:
+
+    type: cdc
+
+    folder: customer_cdc
+
+    filename_prefix: customer_cdc
+
+    format: csv
+
+  card_cdc:
+
+    type: cdc
+
+    folder: card_cdc
+
+    filename_prefix: card_cdc
+
+    format: csv
+
+  loan_cdc:
+
+    type: cdc
+
+    folder: loan_cdc
+
+    filename_prefix: loan_cdc
+
+    format: csv
+
+settings:
+
+  overwrite_existing_files: false
+
+  upload_to_adls: true
+
+  save_local_copy: true
+
+  output_format: csv
+
+  timezone: Asia/Kolkata
+
+  log_level: INFO

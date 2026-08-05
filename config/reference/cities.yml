@@ -1,0 +1,61 @@
+cities:
+
+  - city: Chennai
+    state: Tamil Nadu
+    zone: South
+    pincode_prefix: 600
+
+  - city: Bengaluru
+    state: Karnataka
+    zone: South
+    pincode_prefix: 560
+
+  - city: Hyderabad
+    state: Telangana
+    zone: South
+    pincode_prefix: 500
+
+  - city: Kochi
+    state: Kerala
+    zone: South
+    pincode_prefix: 682
+
+  - city: Mumbai
+    state: Maharashtra
+    zone: West
+    pincode_prefix: 400
+
+  - city: Pune
+    state: Maharashtra
+    zone: West
+    pincode_prefix: 411
+
+  - city: Ahmedabad
+    state: Gujarat
+    zone: West
+    pincode_prefix: 380
+
+  - city: Delhi
+    state: Delhi
+    zone: North
+    pincode_prefix: 110
+
+  - city: Jaipur
+    state: Rajasthan
+    zone: North
+    pincode_prefix: 302
+
+  - city: Lucknow
+    state: Uttar Pradesh
+    zone: North
+    pincode_prefix: 226
+
+  - city: Kolkata
+    state: West Bengal
+    zone: East
+    pincode_prefix: 700
+
+  - city: Bhubaneswar
+    state: Odisha
+    zone: East
+    pincode_prefix: 751

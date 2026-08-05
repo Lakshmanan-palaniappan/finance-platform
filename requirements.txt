@@ -1,0 +1,10 @@
+faker==37.*
+pandas
+pyarrow
+pyyaml
+python-dotenv
+schedule
+azure-identity
+azure-storage-file-datalake
+
+pyspark==4.*

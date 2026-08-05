@@ -1,0 +1,49 @@
+transaction_types:
+
+  Deposit:
+
+    min_amount: 100
+
+    max_amount: 100000
+
+  Withdrawal:
+
+    min_amount: 100
+
+    max_amount: 50000
+
+  Transfer:
+
+    min_amount: 100
+
+    max_amount: 500000
+
+  UPI:
+
+    min_amount: 1
+
+    max_amount: 100000
+
+  ATM:
+
+    min_amount: 100
+
+    max_amount: 20000
+
+status:
+
+  - SUCCESS
+
+  - FAILED
+
+channels:
+
+  - Branch
+
+  - ATM
+
+  - UPI
+
+  - Mobile Banking
+
+  - Internet Banking

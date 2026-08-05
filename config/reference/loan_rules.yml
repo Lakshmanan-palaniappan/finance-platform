@@ -1,0 +1,54 @@
+loan_types:
+
+  Home:
+
+    min_amount: 500000
+
+    max_amount: 10000000
+
+    tenure_years:
+      - 10
+      - 15
+      - 20
+      - 25
+
+  Personal:
+
+    min_amount: 50000
+
+    max_amount: 2000000
+
+    tenure_years:
+      - 2
+      - 3
+      - 5
+
+  Vehicle:
+
+    min_amount: 100000
+
+    max_amount: 3000000
+
+    tenure_years:
+      - 3
+      - 5
+      - 7
+
+  Education:
+
+    min_amount: 100000
+
+    max_amount: 5000000
+
+    tenure_years:
+      - 5
+      - 7
+      - 10
+
+status:
+
+  - ACTIVE
+
+  - CLOSED
+
+  - DEFAULT

@@ -1,0 +1,41 @@
+exchange_rates:
+
+  - base_currency: INR
+    target_currency: USD
+    exchange_rate: 0.0118
+
+  - base_currency: INR
+    target_currency: EUR
+    exchange_rate: 0.0109
+
+  - base_currency: INR
+    target_currency: GBP
+    exchange_rate: 0.0094
+
+  - base_currency: INR
+    target_currency: AED
+    exchange_rate: 0.0432
+
+  - base_currency: INR
+    target_currency: SGD
+    exchange_rate: 0.0157
+
+  - base_currency: INR
+    target_currency: JPY
+    exchange_rate: 1.73
+
+  - base_currency: INR
+    target_currency: AUD
+    exchange_rate: 0.0179
+
+  - base_currency: INR
+    target_currency: CAD
+    exchange_rate: 0.0162
+
+  - base_currency: INR
+    target_currency: CHF
+    exchange_rate: 0.0106
+
+  - base_currency: INR
+    target_currency: CNY
+    exchange_rate: 0.0845

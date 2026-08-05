@@ -1,0 +1,58 @@
+branches:
+
+  Chennai:
+    - T Nagar
+    - Anna Nagar
+    - Velachery
+    - Tambaram
+
+  Bengaluru:
+    - Whitefield
+    - Electronic City
+    - Indiranagar
+    - Koramangala
+
+  Hyderabad:
+    - Gachibowli
+    - Madhapur
+    - Secunderabad
+
+  Mumbai:
+    - Andheri
+    - Bandra
+    - Powai
+    - Dadar
+
+  Delhi:
+    - Connaught Place
+    - Dwarka
+    - Rohini
+
+  Pune:
+    - Hinjewadi
+    - Kothrud
+    - Baner
+
+  Kochi:
+    - Kakkanad
+    - Edappally
+
+  Ahmedabad:
+    - Satellite
+    - Navrangpura
+
+  Jaipur:
+    - Vaishali Nagar
+    - Malviya Nagar
+
+  Lucknow:
+    - Gomti Nagar
+    - Hazratganj
+
+  Kolkata:
+    - Salt Lake
+    - Park Street
+
+  Bhubaneswar:
+    - Patia
+    - Khandagiri

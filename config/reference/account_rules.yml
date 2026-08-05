@@ -1,0 +1,24 @@
+account_types:
+
+  Savings:
+    min_balance: 1000
+
+  Current:
+    min_balance: 10000
+
+  Salary:
+    min_balance: 0
+
+status:
+
+  - ACTIVE
+  - DORMANT
+  - CLOSED
+
+interest_rates:
+
+  Savings: 3.5
+
+  Current: 0
+
+  Salary: 3.0
