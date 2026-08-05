@@ -25,3 +25,14 @@ output/
 # OS
 .DS_Store
 Thumbs.db
+
+.databricks/
+build/
+dist/
+__pycache__/
+*.egg-info
+.venv/
+scratch/**
+!scratch/README.md
+**/explorations/**
+**/!explorations/README.md
