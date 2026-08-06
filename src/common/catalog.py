@@ -1,7 +1,24 @@
-CATALOG = "banking_catalog"
+from common.config import settings
 
-BRONZE_SCHEMA = "bronze"
 
-SILVER_SCHEMA = "silver"
+class Catalog:
 
-GOLD_SCHEMA = "gold"
+    @staticmethod
+    def bronze(table):
+
+        return f"{settings.CATALOG}.{settings.BRONZE_SCHEMA}.{table}"
+
+    @staticmethod
+    def silver(table):
+
+        return f"{settings.CATALOG}.{settings.SILVER_SCHEMA}.{table}"
+
+    @staticmethod
+    def gold(table):
+
+        return f"{settings.CATALOG}.{settings.GOLD_SCHEMA}.{table}"
+
+    @staticmethod
+    def monitoring(table):
+
+        return f"{settings.CATALOG}.{settings.MONITORING_SCHEMA}.{table}"

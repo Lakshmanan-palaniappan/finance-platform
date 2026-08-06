@@ -1,7 +1,31 @@
-LOAN_BRONZE_TABLE = "loan_bronze"
+class Tables:
 
-LOAN_SILVER_TABLE = "loan_silver"
+    CUSTOMER = "customer"
 
-LOAN_GOLD_SUMMARY = "loan_summary"
+    ACCOUNT = "account"
 
-INTEREST_REVENUE_TABLE = "interest_revenue"
+    CUSTOMER_KYC = "customer_kyc"
+
+    LOAN = "loan"
+
+    CARD = "card"
+
+    BRANCH = "branch"
+
+    EXCHANGE_RATE = "exchange_rate"
+
+    TRANSACTION = "transaction"
+
+    ATM_TRANSACTION = "atm_transaction"
+
+    LOGIN_ACTIVITY = "login_activity"
+
+    CUSTOMER360 = "customer360"
+
+    DAILY_TRANSACTION_SUMMARY = "daily_transaction_summary"
+
+    BRANCH_PERFORMANCE = "branch_performance"
+
+    FRAUD_SUMMARY = "fraud_summary"
+
+    ATM_SUMMARY = "atm_summary"
