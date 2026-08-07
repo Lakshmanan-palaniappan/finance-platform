@@ -9,8 +9,8 @@ from pyspark.sql.functions import (
     expr
 )
 
-from common.catalog import CATALOG, SILVER_SCHEMA
-from common.table_names import LOAN_SILVER_TABLE
+from finance_bundle.common.catalog import CATALOG, SILVER_SCHEMA
+from finance_bundle.common.table_names import LOAN_SILVER_TABLE
 
 
 BUSINESS_KEY = "loan_id"

@@ -1,6 +1,6 @@
 from pyspark import pipelines as dp
 
-from silver.loan.loan_transform import transform_loan
+from finance_bundle.silver.loan.loan_transform import transform_loan
 
 
 @dp.table(

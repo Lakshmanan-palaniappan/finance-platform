@@ -1,4 +1,4 @@
-from common.config import settings
+from finance_bundle.common.config import settings
 
 
 class Catalog:

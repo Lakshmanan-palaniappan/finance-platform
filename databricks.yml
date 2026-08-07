@@ -1,6 +1,6 @@
 bundle:
-  name: enterprise-banking-platform
-  uuid: d5562624-9fe4-4095-894f-388b3abd0f3e
+  name: finance_bundle
+  uuid: e8599de7-e987-40c2-a71a-d83a9c59d3a7
 
 include:
   - resources/pipelines/*.yml
@@ -31,8 +31,8 @@ variables:
 
 targets:
   dev:
-    mode: development
     default: true
+    mode: development
 
     workspace:
       host: https://adb-7405606250328066.6.azuredatabricks.net
