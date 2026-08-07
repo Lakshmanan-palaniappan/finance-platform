@@ -1,4 +1,4 @@
-from common.paths import ROOT
+from finance_bundle.common.paths import ROOT
 
 
 class Checkpoints:

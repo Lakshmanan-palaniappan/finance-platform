@@ -1,0 +1,19 @@
+resources:
+  pipelines:
+    bronze_loan:
+      name: bronze-loan-pipeline
+
+      catalog: ${var.catalog}
+      target: ${var.bronze_schema}
+
+      serverless: true
+      development: true
+      channel: CURRENT
+
+      libraries:
+        - file:
+            path: ../../src/finance_bundle/bronze/loan/loan_pipeline.py
+
+      environment:
+        dependencies:
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.1-py3-none-any.whl
