@@ -16,4 +16,4 @@ resources:
 
       environment:
         dependencies:
-          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.1-py3-none-any.whl
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.2-py3-none-any.whl

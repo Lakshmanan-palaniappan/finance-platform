@@ -1,8 +1,8 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
+    col,
     current_timestamp,
     current_date,
-    input_file_name,
     regexp_extract,
     expr,
 )
@@ -101,12 +101,12 @@ def read_loan_data():
         )
         .withColumn(
             "source_file",
-            input_file_name(),
+            col("_metadata.file_path"),
         )
         .withColumn(
             "file_name",
             regexp_extract(
-                input_file_name(),
+                col("_metadata.file_path"),
                 "([^/]+$)",
                 1,
             ),

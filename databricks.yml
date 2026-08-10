@@ -12,7 +12,6 @@ artifacts:
   python_artifact:
     type: whl
     build: uv build --wheel
-    dynamic_version: true
 
 variables:
   catalog:
