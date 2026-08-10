@@ -8,10 +8,15 @@ from pyspark.sql.types import (
 )
 
 
+# ==========================================================
+# Explicit Spark schema
+# ==========================================================
+
 loan_schema = StructType([
     StructField("loan_id", StringType(), False),
     StructField("customer_id", StringType(), False),
     StructField("branch_id", StringType(), False),
+
     StructField("loan_type", StringType(), True),
     StructField("loan_amount", DoubleType(), True),
     StructField("interest_rate", DoubleType(), True),
@@ -26,19 +31,23 @@ loan_schema = StructType([
 ])
 
 
+# ==========================================================
+# Auto Loader schema hints
+# ==========================================================
+
 LOAN_SCHEMA_HINTS = """
-loan_id string,
-customer_id string,
-branch_id string,
-loan_type string,
-loan_amount double,
-interest_rate double,
-tenure_years int,
-monthly_emi double,
-paid_emi int,
-remaining_emi int,
-outstanding_balance double,
-loan_to_income_ratio double,
-sanction_date date,
-status string
+loan_id STRING,
+customer_id STRING,
+branch_id STRING,
+loan_type STRING,
+loan_amount DOUBLE,
+interest_rate DOUBLE,
+tenure_years INT,
+monthly_emi DOUBLE,
+paid_emi INT,
+remaining_emi INT,
+outstanding_balance DOUBLE,
+loan_to_income_ratio DOUBLE,
+sanction_date DATE,
+status STRING
 """
