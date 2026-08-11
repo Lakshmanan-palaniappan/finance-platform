@@ -9,13 +9,15 @@ from pyspark.sql.functions import (
 
 from finance_bundle.common.config import settings
 from finance_bundle.common.paths import (
-    LOAN_INPUT_PATH,
-    LOAN_SCHEMA_PATH,
+    BRANCH_INPUT_PATH,
+    BRANCH_SCHEMA_PATH,
 )
-from finance_bundle.schemas.loan_schema import LOAN_SCHEMA_HINTS
+from finance_bundle.schemas.branch_schema import (
+    BRANCH_SCHEMA_HINTS,
+)
 
 
-def read_loan_data():
+def read_branch_data():
 
     spark = SparkSession.getActiveSession()
 
@@ -48,7 +50,7 @@ def read_loan_data():
 
         .option(
             "cloudFiles.schemaLocation",
-            LOAN_SCHEMA_PATH,
+            BRANCH_SCHEMA_PATH,
         )
 
         # ----------------------------------------------
@@ -57,7 +59,7 @@ def read_loan_data():
 
         .option(
             "cloudFiles.schemaHints",
-            LOAN_SCHEMA_HINTS,
+            BRANCH_SCHEMA_HINTS,
         )
 
         .option(
@@ -78,7 +80,7 @@ def read_loan_data():
         # Source path
         # ----------------------------------------------
 
-        .load(LOAN_INPUT_PATH)
+        .load(BRANCH_INPUT_PATH)
     )
 
     # ----------------------------------------------
