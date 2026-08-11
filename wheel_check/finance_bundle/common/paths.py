@@ -165,3 +165,23 @@ LOAN_INPUT_PATH = Master.LOAN
 LOAN_SCHEMA_PATH = SchemaLocation.LOAN
 
 LOAN_CHECKPOINT_PATH = Checkpoint.LOAN
+
+# ==========================================================
+# Card Pipeline
+# ==========================================================
+
+CARD_INPUT_PATH = Master.CARD
+
+CARD_SCHEMA_PATH = SchemaLocation.CARD
+
+CARD_CHECKPOINT_PATH = Checkpoint.CARD
+
+# ==========================================================
+# Branch Pipeline
+# ==========================================================
+
+BRANCH_INPUT_PATH = Master.BRANCH
+
+BRANCH_SCHEMA_PATH = SchemaLocation.BRANCH
+
+BRANCH_CHECKPOINT_PATH = Checkpoint.BRANCH

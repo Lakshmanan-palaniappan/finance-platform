@@ -1,0 +1,20 @@
+resources:
+  pipelines:
+
+    bronze_branch:
+      name: bronze-branch-pipeline
+
+      catalog: ${var.catalog}
+      target: ${var.bronze_schema}
+
+      serverless: true
+      development: true
+      channel: CURRENT
+
+      libraries:
+        - file:
+            path: ../../src/finance_bundle/bronze/branch/branch_pipeline.py
+
+      environment:
+        dependencies:
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.2-py3-none-any.whl
