@@ -36,3 +36,6 @@ scratch/**
 !scratch/README.md
 **/explorations/**
 **/!explorations/README.md
+
+wheel_check/
+wheel_test/
