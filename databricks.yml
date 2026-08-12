@@ -35,8 +35,8 @@ targets:
     mode: development
 
     workspace:
-      host: https://adb-7405606250328066.6.azuredatabricks.net
-      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+      host: https://adb-7405606546085670.10.azuredatabricks.net
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}/v2
 
     variables:
       catalog: finance_catalog
@@ -49,8 +49,8 @@ targets:
     mode: production
 
     workspace:
-      host: https://adb-7405606250328066.6.azuredatabricks.net
-      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+      host: https://adb-7405606546085670.10.azuredatabricks.net
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}/v2
 
     variables:
       catalog: finance_catalog
