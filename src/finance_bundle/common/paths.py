@@ -185,3 +185,13 @@ BRANCH_INPUT_PATH = Master.BRANCH
 BRANCH_SCHEMA_PATH = SchemaLocation.BRANCH
 
 BRANCH_CHECKPOINT_PATH = Checkpoint.BRANCH
+
+# ==========================================================
+# Customer Pipeline
+# ==========================================================
+
+CUSTOMER_INPUT_PATH = Master.CUSTOMER
+
+CUSTOMER_SCHEMA_PATH = SchemaLocation.CUSTOMER
+
+CUSTOMER_CHECKPOINT_PATH = Checkpoint.CUSTOMER
