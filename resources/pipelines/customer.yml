@@ -1,13 +1,13 @@
 resources:
   pipelines:
 
-    bronze_customer:
+    customer_pipeline:
 
-      name: customer-pipeline
+      name: customer-end-to-end-pipeline
 
       catalog: ${var.catalog}
 
-      target: ${var.bronze_schema}
+      target: ${var.silver_schema}
 
       serverless: true
 
@@ -16,9 +16,17 @@ resources:
       channel: CURRENT
 
       libraries:
+
         - file:
             path: ../../src/finance_bundle/bronze/customer/customer_pipeline.py
 
+        - file:
+            path: ../../src/finance_bundle/silver/customer/customer_pipeline.py
+
+        # - file:
+        #     path: ../../src/finance_bundle/gold/customer360/customer360_pipeline.py
+
       environment:
+
         dependencies:
-          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.3-py3-none-any.whl
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.4-py3-none-any.whl
