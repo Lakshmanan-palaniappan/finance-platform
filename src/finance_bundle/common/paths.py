@@ -5,18 +5,15 @@ from finance_bundle.common.config import settings
 # Storage Root
 # ==========================================================
 
-STORAGE_ROOT = (
-    f"abfss://{settings.CONTAINER}"
-    f"@{settings.STORAGE_ACCOUNT}.dfs.core.windows.net"
-)
+STORAGE_ROOT = f"abfss://{settings.CONTAINER}@{settings.STORAGE_ACCOUNT}.dfs.core.windows.net"
 
 
 # ==========================================================
 # Landing Zone
 # ==========================================================
 
-class Landing:
 
+class Landing:
     ROOT = f"{STORAGE_ROOT}/landing"
 
     MASTER = f"{ROOT}/master"
@@ -28,8 +25,8 @@ class Landing:
 # Master Source Files
 # ==========================================================
 
-class Master:
 
+class Master:
     CUSTOMER = f"{Landing.MASTER}/customers"
     ACCOUNT = f"{Landing.MASTER}/accounts"
     CUSTOMER_KYC = f"{Landing.MASTER}/customer_kyc"
@@ -43,8 +40,8 @@ class Master:
 # Streaming Source Files
 # ==========================================================
 
-class Streaming:
 
+class Streaming:
     TRANSACTION = f"{Landing.STREAMING}/transactions"
     ATM = f"{Landing.STREAMING}/atm_transactions"
     LOGIN = f"{Landing.STREAMING}/login_activity"
@@ -54,8 +51,8 @@ class Streaming:
 # CDC Source Files
 # ==========================================================
 
-class CDC:
 
+class CDC:
     CUSTOMER = f"{Landing.CDC}/customer_cdc"
     ACCOUNT = f"{Landing.CDC}/account_cdc"
     LOAN = f"{Landing.CDC}/loan_cdc"
@@ -66,8 +63,8 @@ class CDC:
 # Bronze
 # ==========================================================
 
-class Bronze:
 
+class Bronze:
     ROOT = f"{STORAGE_ROOT}/bronze"
 
     CUSTOMER = f"{ROOT}/customer"
@@ -81,8 +78,8 @@ class Bronze:
 # Silver
 # ==========================================================
 
-class Silver:
 
+class Silver:
     ROOT = f"{STORAGE_ROOT}/silver"
 
     CUSTOMER = f"{ROOT}/customer"
@@ -94,8 +91,8 @@ class Silver:
 # Gold
 # ==========================================================
 
-class Gold:
 
+class Gold:
     ROOT = f"{STORAGE_ROOT}/gold"
 
     CUSTOMER360 = f"{ROOT}/customer360"
@@ -107,8 +104,8 @@ class Gold:
 # Quarantine
 # ==========================================================
 
-class Quarantine:
 
+class Quarantine:
     ROOT = f"{STORAGE_ROOT}/quarantine"
 
     CUSTOMER = f"{ROOT}/customer"
@@ -120,11 +117,13 @@ class Quarantine:
 # Auto Loader Schema Locations
 # ==========================================================
 
-class SchemaLocation:
 
+class SchemaLocation:
     ROOT = f"{STORAGE_ROOT}/schema"
 
     CUSTOMER = f"{ROOT}/customer"
+    CUSTOMER_CDC = f"{ROOT}/customer_cdc"
+
     ACCOUNT = f"{ROOT}/account"
     CUSTOMER_KYC = f"{ROOT}/customer_kyc"
     LOAN = f"{ROOT}/loan"
@@ -140,11 +139,16 @@ class SchemaLocation:
 # Checkpoints
 # ==========================================================
 
-class Checkpoint:
 
+class Checkpoint:
     ROOT = f"{STORAGE_ROOT}/checkpoints"
 
+    # Bronze
     CUSTOMER = f"{ROOT}/customer"
+
+    # CDC
+    CUSTOMER_CDC = f"{ROOT}/cdc/customer"
+
     ACCOUNT = f"{ROOT}/account"
     CUSTOMER_KYC = f"{ROOT}/customer_kyc"
     LOAN = f"{ROOT}/loan"
@@ -175,6 +179,14 @@ CARD_INPUT_PATH = Master.CARD
 CARD_SCHEMA_PATH = SchemaLocation.CARD
 
 CARD_CHECKPOINT_PATH = Checkpoint.CARD
+
+# ==========================================================
+# Customer CDC Pipeline
+# ==========================================================
+
+CUSTOMER_CDC_INPUT_PATH = CDC.CUSTOMER
+
+CUSTOMER_CDC_CHECKPOINT_PATH = Checkpoint.CUSTOMER_CDC
 
 # ==========================================================
 # Branch Pipeline
