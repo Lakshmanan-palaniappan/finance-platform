@@ -1,7 +1,7 @@
 class Tables:
 
     # ==========================================================
-    # Bronze / Silver domain tables
+    # Bronze
     # ==========================================================
 
     CUSTOMER = "customer"
@@ -30,3 +30,4 @@ class Tables:
     BRANCH_PERFORMANCE = "branch_performance"
     FRAUD_SUMMARY = "fraud_summary"
     ATM_SUMMARY = "atm_summary"
+    EXECUTIVE_DASHBOARD = "executive_dashboard"
