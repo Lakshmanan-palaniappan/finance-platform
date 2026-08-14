@@ -23,10 +23,10 @@ resources:
         - file:
             path: ../../src/finance_bundle/silver/customer/customer_pipeline.py
 
-        # - file:
-        #     path: ../../src/finance_bundle/gold/customer360/customer360_pipeline.py
+        - file:
+            path: ../../src/finance_bundle/gold/customer360/customer360_pipeline.py
 
       environment:
 
         dependencies:
-          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.4-py3-none-any.whl
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.5-py3-none-any.whl
