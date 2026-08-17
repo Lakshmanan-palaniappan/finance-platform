@@ -217,3 +217,14 @@ EXCHANGE_RATE_INPUT_PATH = Master.EXCHANGE_RATE
 EXCHANGE_RATE_SCHEMA_PATH = SchemaLocation.EXCHANGE_RATE
 
 EXCHANGE_RATE_CHECKPOINT_PATH = Checkpoint.EXCHANGE_RATE
+
+# ==========================================================
+# ATM Transaction Pipeline
+# ==========================================================
+
+ATM_TRANSACTION_INPUT_PATH = Streaming.ATM
+
+ATM_TRANSACTION_SCHEMA_PATH = SchemaLocation.ATM
+
+ATM_TRANSACTION_CHECKPOINT_PATH = Checkpoint.ATM
+
