@@ -207,3 +207,13 @@ CUSTOMER_INPUT_PATH = Master.CUSTOMER
 CUSTOMER_SCHEMA_PATH = SchemaLocation.CUSTOMER
 
 CUSTOMER_CHECKPOINT_PATH = Checkpoint.CUSTOMER
+
+# ==========================================================
+# Exchange Rate Pipeline
+# ==========================================================
+
+EXCHANGE_RATE_INPUT_PATH = Master.EXCHANGE_RATE
+
+EXCHANGE_RATE_SCHEMA_PATH = SchemaLocation.EXCHANGE_RATE
+
+EXCHANGE_RATE_CHECKPOINT_PATH = Checkpoint.EXCHANGE_RATE
