@@ -154,7 +154,10 @@ class SchemaLocation:
     ACCOUNT_CDC = f"{ROOT}/account_cdc"
 
     CUSTOMER_KYC = f"{ROOT}/customer_kyc"
+
     LOAN = f"{ROOT}/loan"
+    LOAN_CDC = f"{ROOT}/loan_cdc"
+
     CARD = f"{ROOT}/card"
     BRANCH = f"{ROOT}/branch"
     EXCHANGE_RATE = f"{ROOT}/exchange_rate"
@@ -180,6 +183,7 @@ class Checkpoint:
 
     CUSTOMER_KYC = f"{ROOT}/customer_kyc"
     LOAN = f"{ROOT}/loan"
+    LOAN_CDC = f"{ROOT}/cdc/loan"
     CARD = f"{ROOT}/card"
     BRANCH = f"{ROOT}/branch"
     EXCHANGE_RATE = f"{ROOT}/exchange_rate"
@@ -193,6 +197,7 @@ class Checkpoint:
 
     CUSTOMER_CDC = f"{ROOT}/cdc/customer"
     ACCOUNT_CDC = f"{ROOT}/cdc/account"
+    LOAN_CDC = f"{ROOT}/cdc/loan"
 
 
 # ==========================================================
@@ -269,7 +274,19 @@ LOAN_CHECKPOINT_PATH = (
     Checkpoint.LOAN
 )
 
+# ==========================================================
+# Loan CDC Pipeline
+# ==========================================================
 
+LOAN_CDC_INPUT_PATH = CDC.LOAN
+
+LOAN_CDC_SCHEMA_PATH = (
+    SchemaLocation.LOAN_CDC
+)
+
+LOAN_CDC_CHECKPOINT_PATH = (
+    Checkpoint.LOAN_CDC
+)
 # ==========================================================
 # Card Pipeline
 # ==========================================================
