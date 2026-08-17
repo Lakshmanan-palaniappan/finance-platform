@@ -9,7 +9,6 @@ from finance_bundle.bronze.account.account_cdc_ingestion import (
 )
 
 from finance_bundle.common.catalog import Catalog
-
 from finance_bundle.common.table_names import Tables
 
 
@@ -19,7 +18,9 @@ from finance_bundle.common.table_names import Tables
 
 
 @dp.table(
-    name=Catalog.bronze(Tables.ACCOUNT),
+    name=Catalog.bronze(
+        Tables.ACCOUNT
+    ),
     comment="Bronze Account master data",
 )
 @dp.expect(
@@ -45,7 +46,9 @@ def account_bronze():
 
 
 @dp.table(
-    name=Catalog.bronze(Tables.ACCOUNT_CDC),
+    name=Catalog.bronze(
+        Tables.ACCOUNT_CDC
+    ),
     comment="Bronze Account CDC events",
 )
 @dp.expect(

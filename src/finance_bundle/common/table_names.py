@@ -9,6 +9,9 @@ class Tables:
     CUSTOMER_QUARANTINE = "customer_quarantine"
 
     ACCOUNT = "account"
+    ACCOUNT_CDC = "account_cdc"
+    ACCOUNT_QUARANTINE = "account_quarantine"
+
     CUSTOMER_KYC = "customer_kyc"
     LOAN = "loan"
     CARD = "card"
@@ -25,6 +28,9 @@ class Tables:
     CUSTOMER360 = "customer360"
     CUSTOMER_RISK = "customer_risk"
     RELATIONSHIP_VALUE = "relationship_value"
+
+    ACCOUNT_PORTFOLIO_SUMMARY = "account_portfolio_summary"
+    ACCOUNT_BALANCE_SUMMARY = "account_balance_summary"
 
     DAILY_TRANSACTION_SUMMARY = "daily_transaction_summary"
     BRANCH_PERFORMANCE = "branch_performance"
