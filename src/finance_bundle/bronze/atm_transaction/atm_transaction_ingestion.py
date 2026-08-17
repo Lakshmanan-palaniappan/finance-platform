@@ -1,4 +1,3 @@
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
     col,
     current_timestamp,
@@ -7,105 +6,62 @@ from pyspark.sql.functions import (
     expr,
 )
 
-from finance_bundle.common.config import settings
-from finance_bundle.common.paths import (
-    ATM_TRANSACTION_INPUT_PATH,
-    ATM_TRANSACTION_SCHEMA_PATH,
-)
-
-from finance_bundle.schemas.atm_transaction_schema import (
-    ATM_TRANSACTION_SCHEMA_HINTS,
+from finance_bundle.bronze.atm_transaction.atm_transaction_streaming import (
+    read_atm_transaction_stream,
 )
 
 
 def read_atm_transaction_data():
 
-    spark = SparkSession.getActiveSession()
+    df = read_atm_transaction_stream()
 
-    if spark is None:
-        raise RuntimeError(
-            "No active Spark session found."
-        )
-
-    df = (
-        spark.readStream
-        .format(settings.AUTOLOADER)
-
-        # ----------------------------------------------
-        # Source format
-        # ----------------------------------------------
-
-        .option(
-            "cloudFiles.format",
-            settings.FILE_FORMAT,
-        )
-
-        .option(
-            "header",
-            settings.HEADER,
-        )
-
-        # ----------------------------------------------
-        # Auto Loader schema state
-        # ----------------------------------------------
-
-        .option(
-            "cloudFiles.schemaLocation",
-            ATM_TRANSACTION_SCHEMA_PATH,
-        )
-
-        # ----------------------------------------------
-        # Custom schema + schema evolution
-        # ----------------------------------------------
-
-        .option(
-            "cloudFiles.schemaHints",
-            ATM_TRANSACTION_SCHEMA_HINTS,
-        )
-
-        .option(
-            "cloudFiles.schemaEvolutionMode",
-            settings.SCHEMA_EVOLUTION,
-        )
-
-        # ----------------------------------------------
-        # Rescue unexpected values
-        # ----------------------------------------------
-
-        .option(
-            "rescuedDataColumn",
-            "_rescued_data",
-        )
-
-        # ----------------------------------------------
-        # Source path
-        # ----------------------------------------------
-
-        .load(ATM_TRANSACTION_INPUT_PATH)
-    )
-
-    # ----------------------------------------------
-    # Ingestion metadata
-    # ----------------------------------------------
+    # ==================================================
+    # Bronze ingestion metadata
+    # ==================================================
 
     df = (
         df
+
+        # ----------------------------------------------
+        # Ingestion timestamp
+        # ----------------------------------------------
+
         .withColumn(
             "ingestion_timestamp",
             current_timestamp(),
         )
+
+        # ----------------------------------------------
+        # Ingestion date
+        # ----------------------------------------------
+
         .withColumn(
             "ingestion_date",
             current_date(),
         )
+
+        # ----------------------------------------------
+        # Pipeline run ID
+        # ----------------------------------------------
+
         .withColumn(
             "pipeline_run_id",
             expr("uuid()"),
         )
+
+        # ----------------------------------------------
+        # Complete source file path
+        # ----------------------------------------------
+
         .withColumn(
             "source_file",
             col("_metadata.file_path"),
         )
+
+        # ----------------------------------------------
+        # Source file name
+        # ----------------------------------------------
+
         .withColumn(
             "file_name",
             regexp_extract(
@@ -114,10 +70,20 @@ def read_atm_transaction_data():
                 1,
             ),
         )
+
+        # ----------------------------------------------
+        # File size
+        # ----------------------------------------------
+
         .withColumn(
             "file_size",
             col("_metadata.file_size"),
         )
+
+        # ----------------------------------------------
+        # File modification time
+        # ----------------------------------------------
+
         .withColumn(
             "file_modification_time",
             col("_metadata.file_modification_time"),
