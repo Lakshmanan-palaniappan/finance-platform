@@ -13,7 +13,11 @@ class Tables:
     ACCOUNT_QUARANTINE = "account_quarantine"
 
     CUSTOMER_KYC = "customer_kyc"
+    
     LOAN = "loan"
+    LOAN_CDC = "loan_cdc"
+    LOAN_QUARANTINE = "loan_quarantine"
+
     CARD = "card"
     BRANCH = "branch"
     EXCHANGE_RATE = "exchange_rate"
