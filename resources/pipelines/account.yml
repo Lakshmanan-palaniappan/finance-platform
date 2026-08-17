@@ -1,0 +1,46 @@
+resources:
+
+  pipelines:
+
+    account_pipeline:
+
+      name: account-end-to-end-pipeline
+
+      catalog: ${var.catalog}
+
+      target: ${var.silver_schema}
+
+      serverless: true
+
+      development: true
+
+      channel: CURRENT
+
+      libraries:
+
+        # --------------------------------------------------
+        # Bronze
+        # --------------------------------------------------
+
+        - file:
+            path: ../../src/finance_bundle/bronze/account/account_pipeline.py
+
+        # --------------------------------------------------
+        # Silver
+        # --------------------------------------------------
+
+        - file:
+            path: ../../src/finance_bundle/silver/account/account_pipeline.py
+
+        # --------------------------------------------------
+        # Gold
+        # --------------------------------------------------
+
+        - file:
+            path: ../../src/finance_bundle/gold/account/account_pipeline.py
+
+      environment:
+
+        dependencies:
+
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.5-py3-none-any.whl
