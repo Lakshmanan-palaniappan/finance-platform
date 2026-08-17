@@ -28,6 +28,7 @@ from finance_bundle.silver.account.account_transform import (
 # Table Names
 # ==========================================================
 
+
 BRONZE_ACCOUNT = Catalog.bronze(
     Tables.ACCOUNT
 )
@@ -42,33 +43,63 @@ SILVER_ACCOUNT = Catalog.silver(
 
 
 # ==========================================================
-# Bronze Account CDC Source
+# Account CDC Source
 # ==========================================================
+
 
 @dp.temporary_view(
     name="account_cdc_source",
 )
 def account_cdc_source():
 
+    # ------------------------------------------------------
+    # Read Account Master
+    # ------------------------------------------------------
+
     account_df = dp.read(
         BRONZE_ACCOUNT
     )
+
+    # ------------------------------------------------------
+    # Read Account CDC
+    # ------------------------------------------------------
 
     cdc_df = dp.read_stream(
         BRONZE_ACCOUNT_CDC
     )
 
-    # ======================================================
+    # ------------------------------------------------------
     # Normalize Account
-    # ======================================================
+    # ------------------------------------------------------
 
     account_df = normalize_account(
         account_df
     )
 
-    # ======================================================
+    # ------------------------------------------------------
+    # Normalize Account Column Names
+    # ------------------------------------------------------
+
+    for column_name in account_df.columns:
+
+        normalized = (
+            column_name
+            .strip()
+            .lower()
+            .replace(" ", "_")
+            .replace("-", "_")
+        )
+
+        if normalized != column_name:
+
+            account_df = account_df.withColumnRenamed(
+                column_name,
+                normalized,
+            )
+
+    # ------------------------------------------------------
     # Normalize CDC Column Names
-    # ======================================================
+    # ------------------------------------------------------
 
     for column_name in cdc_df.columns:
 
@@ -120,11 +151,9 @@ def account_cdc_source():
         )
 
         .withColumn(
-            "attribute",
-            F.lower(
-                F.trim(
-                    F.col("attribute")
-                )
+            "batch_id",
+            F.trim(
+                F.col("batch_id")
             ),
         )
     )
@@ -138,10 +167,11 @@ def account_cdc_source():
     )
 
     # ======================================================
-    # Join CDC Events With Current Account State
+    # Join CDC Events With Account State
     # ======================================================
 
     joined_df = (
+
         cdc_df.alias("cdc")
 
         .join(
@@ -156,7 +186,7 @@ def account_cdc_source():
     )
 
     # ======================================================
-    # Full Account CDC Record
+    # Create Full CDC Record
     # ======================================================
 
     return joined_df.select(
@@ -214,16 +244,16 @@ def account_cdc_source():
         ).alias("_operation"),
 
         F.col(
-            "cdc.change_timestamp"
-        ).alias("_sequence_timestamp"),
-
-        F.col(
-            "cdc.event_timestamp"
-        ).alias("_event_timestamp"),
+            "cdc.batch_id"
+        ).alias("_batch_id"),
 
         F.col(
             "cdc.event_id"
         ).alias("_event_id"),
+
+        F.col(
+            "cdc.entity"
+        ).alias("_entity"),
     )
 
 
@@ -231,7 +261,9 @@ def account_cdc_source():
 # Silver Account SCD Type 2 Table
 # ==========================================================
 
+
 dp.create_streaming_table(
+
     name=SILVER_ACCOUNT,
 
     comment=(
@@ -244,6 +276,7 @@ dp.create_streaming_table(
 # AUTO CDC
 # ==========================================================
 
+
 dp.create_auto_cdc_flow(
 
     target=SILVER_ACCOUNT,
@@ -255,7 +288,7 @@ dp.create_auto_cdc_flow(
     ],
 
     sequence_by=F.col(
-        "_sequence_timestamp"
+        "_batch_id"
     ),
 
     apply_as_deletes=(
@@ -266,9 +299,9 @@ dp.create_auto_cdc_flow(
 
     except_column_list=[
         "_operation",
-        "_sequence_timestamp",
-        "_event_timestamp",
+        "_batch_id",
         "_event_id",
+        "_entity",
     ],
 
     stored_as_scd_type=2,
