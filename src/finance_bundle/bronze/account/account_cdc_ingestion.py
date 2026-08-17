@@ -16,10 +16,6 @@ from finance_bundle.common.paths import (
     SchemaLocation,
 )
 
-from finance_bundle.schemas.account_cdc_schema import (
-    ACCOUNT_CDC_SCHEMA,
-)
-
 
 def read_account_cdc_data():
 
@@ -34,9 +30,9 @@ def read_account_cdc_data():
         spark.readStream
         .format(settings.AUTOLOADER)
 
-        # --------------------------------------------------
+        # ==================================================
         # File Format
-        # --------------------------------------------------
+        # ==================================================
 
         .option(
             "cloudFiles.format",
@@ -48,36 +44,32 @@ def read_account_cdc_data():
             settings.HEADER,
         )
 
-        # --------------------------------------------------
+        # ==================================================
         # Schema Location
-        # --------------------------------------------------
+        # ==================================================
 
         .option(
             "cloudFiles.schemaLocation",
             SchemaLocation.ACCOUNT_CDC,
         )
 
-        # --------------------------------------------------
-        # Schema Evolution
-        # --------------------------------------------------
-
         .option(
             "cloudFiles.schemaEvolutionMode",
             "addNewColumns",
         )
 
-        # --------------------------------------------------
+        # ==================================================
         # Rescued Data
-        # --------------------------------------------------
+        # ==================================================
 
         .option(
             "rescuedDataColumn",
             "_rescued_data",
         )
 
-        # --------------------------------------------------
+        # ==================================================
         # Source
-        # --------------------------------------------------
+        # ==================================================
 
         .load(CDC.ACCOUNT)
     )
@@ -104,13 +96,12 @@ def read_account_cdc_data():
             )
 
     # ======================================================
-    # Normalize CDC Values
+    # Normalize Entity
     # ======================================================
 
-    df = (
-        df
+    if "entity" in df.columns:
 
-        .withColumn(
+        df = df.withColumn(
             "entity",
             lower(
                 trim(
@@ -119,7 +110,13 @@ def read_account_cdc_data():
             ),
         )
 
-        .withColumn(
+    # ======================================================
+    # Normalize Operation
+    # ======================================================
+
+    if "operation" in df.columns:
+
+        df = df.withColumn(
             "operation",
             lower(
                 trim(
@@ -128,22 +125,31 @@ def read_account_cdc_data():
             ),
         )
 
-        .withColumn(
+    # ======================================================
+    # Normalize Account ID
+    # ======================================================
+
+    if "account_id" in df.columns:
+
+        df = df.withColumn(
             "account_id",
             trim(
                 col("account_id")
             ),
         )
 
-        .withColumn(
-            "attribute",
-            lower(
-                trim(
-                    col("attribute")
-                )
+    # ======================================================
+    # Normalize Batch ID
+    # ======================================================
+
+    if "batch_id" in df.columns:
+
+        df = df.withColumn(
+            "batch_id",
+            trim(
+                col("batch_id")
             ),
         )
-    )
 
     # ======================================================
     # Metadata
