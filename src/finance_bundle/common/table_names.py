@@ -19,6 +19,9 @@ class Tables:
     LOAN_QUARANTINE = "loan_quarantine"
 
     CARD = "card"
+    CARD_CDC = "card_cdc"
+    CARD_QUARANTINE = "card_quarantine"
+
     BRANCH = "branch"
     EXCHANGE_RATE = "exchange_rate"
     TRANSACTION = "transaction"
