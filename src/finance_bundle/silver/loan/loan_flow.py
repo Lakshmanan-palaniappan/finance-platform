@@ -1,155 +1,53 @@
-from delta.tables import DeltaTable
-from pyspark.sql import DataFrame
-from pyspark.sql.functions import (
-    col,
-    lit,
-    when,
-    current_date,
-    current_timestamp,
-    expr
-)
+from pyspark import pipelines as dp
 
-from finance_bundle.common.catalog import CATALOG, SILVER_SCHEMA
-from finance_bundle.common.table_names import LOAN_SILVER_TABLE
+from finance_bundle.common.catalog import Catalog
+from finance_bundle.common.table_names import Tables
 
+
+# ==========================================================
+# BUSINESS KEY
+# ==========================================================
 
 BUSINESS_KEY = "loan_id"
 
-TRACKED_COLUMNS = [
-    "loan_amount",
-    "interest_rate",
-    "monthly_emi",
-    "paid_emi",
-    "remaining_emi",
-    "outstanding_balance",
-    "loan_to_income_ratio",
-    "status"
-]
+
+# ==========================================================
+# CREATE SCD TYPE 2 TARGET
+# ==========================================================
+
+dp.create_streaming_table(
+    name=Catalog.silver(Tables.LOAN),
+    comment="Silver Loan table maintained using SCD Type 2"
+)
 
 
-def identify_cdc(incoming_df: DataFrame, existing_df: DataFrame) -> DataFrame:
+# ==========================================================
+# AUTO CDC / SCD TYPE 2
+# ==========================================================
 
-    existing = existing_df.alias("e")
+dp.create_auto_cdc_flow(
+    target=Catalog.silver(Tables.LOAN),
 
-    incoming = incoming_df.alias("i")
+    source="loan_cdc_prepared",
 
-    joined = incoming.join(
-        existing,
-        col("i.loan_id") == col("e.loan_id"),
-        "left"
-    )
+    keys=[
+        BUSINESS_KEY
+    ],
 
-    update_condition = (
+    sequence_by="change_timestamp",
 
-        (col("i.loan_amount") != col("e.loan_amount")) |
+    apply_as_deletes=(
+        "operation = 'delete'"
+    ),
 
-        (col("i.interest_rate") != col("e.interest_rate")) |
+    except_column_list=[
+        "operation",
+        "event_id",
+        "batch_id",
+        "source_system",
+        "event_timestamp",
+        "change_timestamp",
+    ],
 
-        (col("i.monthly_emi") != col("e.monthly_emi")) |
-
-        (col("i.paid_emi") != col("e.paid_emi")) |
-
-        (col("i.remaining_emi") != col("e.remaining_emi")) |
-
-        (col("i.outstanding_balance") != col("e.outstanding_balance")) |
-
-        (col("i.loan_to_income_ratio") != col("e.loan_to_income_ratio")) |
-
-        (col("i.status") != col("e.status"))
-
-    )
-
-    return (
-
-        joined
-
-        .withColumn(
-
-            "operation",
-
-            when(
-                col("e.loan_id").isNull(),
-                lit("INSERT")
-            )
-
-            .when(
-                update_condition,
-                lit("UPDATE")
-            )
-
-            .otherwise(
-                lit("NO_CHANGE")
-            )
-
-        )
-
-    )
-def prepare_scd2(df: DataFrame) -> DataFrame:
-
-    return (
-
-        df
-
-        .filter(
-            col("operation") != "NO_CHANGE"
-        )
-
-        .withColumn(
-            "effective_start_date",
-            current_date()
-        )
-
-        .withColumn(
-            "effective_end_date",
-            lit("9999-12-31").cast("date")
-        )
-
-        .withColumn(
-            "is_current",
-            lit(True)
-        )
-
-        .withColumn(
-            "version",
-            lit(1)
-        )
-
-        .withColumn(
-            "created_timestamp",
-            current_timestamp()
-        )
-
-    )
-def expire_existing_records(delta_table):
-
-    (
-
-        delta_table.alias("target")
-
-        .update(
-
-            condition="""
-
-            target.loan_id IN (
-
-                SELECT loan_id
-
-                FROM source_updates
-
-            )
-
-            AND target.is_current = true
-
-            """,
-
-            set={
-
-                "effective_end_date": "current_date()",
-
-                "is_current": "false"
-
-            }
-
-        )
-
-    )
+    stored_as_scd_type=2,
+)
