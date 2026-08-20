@@ -99,6 +99,7 @@ class Silver:
     ACCOUNT = f"{ROOT}/account"
     CUSTOMER_KYC = f"{ROOT}/customer_kyc"
     LOAN = f"{ROOT}/loan"
+    TRANSACTION = f"{ROOT}/transaction"
 
 
 # ==========================================================
@@ -144,6 +145,7 @@ class Quarantine:
     ACCOUNT = f"{ROOT}/account"
     CUSTOMER_KYC = f"{ROOT}/customer_kyc"
     LOAN = f"{ROOT}/loan"
+    TRANSACTION = f"{ROOT}/transaction"
 
 
 # ==========================================================
@@ -396,4 +398,21 @@ CUSTOMER_KYC_SCHEMA_PATH = (
 
 CUSTOMER_KYC_CHECKPOINT_PATH = (
     Checkpoint.CUSTOMER_KYC
+)
+
+
+# ==========================================================
+# Transaction Streaming Pipeline
+# ==========================================================
+
+TRANSACTION_INPUT_PATH = (
+    Streaming.TRANSACTION
+)
+
+TRANSACTION_SCHEMA_PATH = (
+    SchemaLocation.TRANSACTION
+)
+
+TRANSACTION_CHECKPOINT_PATH = (
+    Checkpoint.TRANSACTION
 )

@@ -26,6 +26,7 @@ class Tables:
     BRANCH = "branch"
     EXCHANGE_RATE = "exchange_rate"
     TRANSACTION = "transaction"
+    TRANSACTION_QUARANTINE = "transaction_quarantine"
     ATM_TRANSACTION = "atm_transaction"
     LOGIN_ACTIVITY = "login_activity"
 
