@@ -81,6 +81,7 @@ class Bronze:
 
     CUSTOMER = f"{ROOT}/customer"
     ACCOUNT = f"{ROOT}/account"
+    CUSTOMER_KYC = f"{ROOT}/customer_kyc"
     LOAN = f"{ROOT}/loan"
     CARD = f"{ROOT}/card"
     TRANSACTION = f"{ROOT}/transaction"
@@ -96,6 +97,7 @@ class Silver:
 
     CUSTOMER = f"{ROOT}/customer"
     ACCOUNT = f"{ROOT}/account"
+    CUSTOMER_KYC = f"{ROOT}/customer_kyc"
     LOAN = f"{ROOT}/loan"
 
 
@@ -117,6 +119,10 @@ class Gold:
         f"{ROOT}/account_balance_summary"
     )
 
+    CUSTOMER_KYC_COMPLIANCE = (
+        f"{ROOT}/customer_kyc_compliance"
+    )
+
     DAILY_TRANSACTION = (
         f"{ROOT}/daily_transaction_summary"
     )
@@ -136,6 +142,7 @@ class Quarantine:
 
     CUSTOMER = f"{ROOT}/customer"
     ACCOUNT = f"{ROOT}/account"
+    CUSTOMER_KYC = f"{ROOT}/customer_kyc"
     LOAN = f"{ROOT}/loan"
 
 
@@ -182,12 +189,14 @@ class Checkpoint:
 
     CUSTOMER = f"{ROOT}/customer"
     ACCOUNT = f"{ROOT}/account"
-
     CUSTOMER_KYC = f"{ROOT}/customer_kyc"
+
     LOAN = f"{ROOT}/loan"
     LOAN_CDC = f"{ROOT}/cdc/loan"
+
     CARD = f"{ROOT}/card"
     CARD_CDC = f"{ROOT}/card_cdc"
+
     BRANCH = f"{ROOT}/branch"
     EXCHANGE_RATE = f"{ROOT}/exchange_rate"
     TRANSACTION = f"{ROOT}/transaction"
@@ -278,6 +287,7 @@ LOAN_CHECKPOINT_PATH = (
     Checkpoint.LOAN
 )
 
+
 # ==========================================================
 # Loan CDC Pipeline
 # ==========================================================
@@ -291,6 +301,8 @@ LOAN_CDC_SCHEMA_PATH = (
 LOAN_CDC_CHECKPOINT_PATH = (
     Checkpoint.LOAN_CDC
 )
+
+
 # ==========================================================
 # Card Pipeline
 # ==========================================================
@@ -304,6 +316,7 @@ CARD_SCHEMA_PATH = (
 CARD_CHECKPOINT_PATH = (
     Checkpoint.CARD
 )
+
 
 # ==========================================================
 # Card CDC Pipeline
@@ -366,4 +379,21 @@ ATM_TRANSACTION_SCHEMA_PATH = (
 
 ATM_TRANSACTION_CHECKPOINT_PATH = (
     Checkpoint.ATM
+)
+
+
+# ==========================================================
+# Customer KYC Pipeline
+# ==========================================================
+
+CUSTOMER_KYC_INPUT_PATH = (
+    Master.CUSTOMER_KYC
+)
+
+CUSTOMER_KYC_SCHEMA_PATH = (
+    SchemaLocation.CUSTOMER_KYC
+)
+
+CUSTOMER_KYC_CHECKPOINT_PATH = (
+    Checkpoint.CUSTOMER_KYC
 )

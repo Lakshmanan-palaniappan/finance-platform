@@ -38,3 +38,12 @@ class Catalog:
             f"{settings.MONITORING_SCHEMA}."
             f"{table}"
         )
+
+    @staticmethod
+    def quarantine(table):
+
+        return (
+            f"{settings.CATALOG}."
+            f"{settings.QUARANTINE_SCHEMA}."
+            f"{table}"
+        )

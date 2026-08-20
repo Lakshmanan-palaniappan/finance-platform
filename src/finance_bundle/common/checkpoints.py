@@ -67,6 +67,14 @@ class CDCCheckpoint:
         Checkpoint.ACCOUNT_CDC
     )
 
+    LOAN = (
+        Checkpoint.LOAN_CDC
+    )
+
+    CARD = (
+        Checkpoint.CARD_CDC
+    )
+
 
 # ==========================================================
 # Silver Checkpoints
@@ -133,6 +141,11 @@ class GoldCheckpoint:
     ACCOUNT_BALANCE_SUMMARY = (
         f"{Checkpoints.ROOT}/gold/"
         f"account_balance_summary"
+    )
+
+    CUSTOMER_KYC_COMPLIANCE = (
+        f"{Checkpoints.ROOT}/gold/"
+        f"customer_kyc_compliance"
     )
 
     DAILY_TRANSACTION_SUMMARY = (
