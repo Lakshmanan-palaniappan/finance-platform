@@ -1,0 +1,46 @@
+resources:
+
+  pipelines:
+
+    customer_kyc_pipeline:
+
+      name: customer-kyc-end-to-end-pipeline
+
+      catalog: ${var.catalog}
+
+      target: ${var.silver_schema}
+
+      serverless: true
+
+      development: true
+
+      channel: CURRENT
+
+      libraries:
+
+        # --------------------------------------------------
+        # Bronze
+        # --------------------------------------------------
+
+        - file:
+            path: ../../src/finance_bundle/bronze/customer_kyc/customer_kyc_pipeline.py
+
+        # --------------------------------------------------
+        # Silver
+        # --------------------------------------------------
+
+        - file:
+            path: ../../src/finance_bundle/silver/customer_kyc/customer_kyc_pipeline.py
+
+        # # --------------------------------------------------
+        # # Gold
+        # # --------------------------------------------------
+
+        - file:
+            path: ../../src/finance_bundle/gold/customer_kyc/customer_kyc_pipeline.py
+
+      environment:
+
+        dependencies:
+
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.6-py3-none-any.whl

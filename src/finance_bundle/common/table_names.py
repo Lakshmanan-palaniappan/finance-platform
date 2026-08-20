@@ -1,5 +1,4 @@
 class Tables:
-
     # ==========================================================
     # Bronze
     # ==========================================================
@@ -13,7 +12,9 @@ class Tables:
     ACCOUNT_QUARANTINE = "account_quarantine"
 
     CUSTOMER_KYC = "customer_kyc"
-    
+    CUSTOMER_KYC_QUARANTINE = "customer_kyc_quarantine"
+    CUSTOMER_KYC_COMPLIANCE = "customer_kyc_compliance"
+
     LOAN = "loan"
     LOAN_CDC = "loan_cdc"
     LOAN_QUARANTINE = "loan_quarantine"
