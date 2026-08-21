@@ -25,6 +25,8 @@ class Tables:
 
     BRANCH = "branch"
     EXCHANGE_RATE = "exchange_rate"
+    EXCHANGE_RATE_QUARANTINE = "exchange_rate_quarantine"
+
     TRANSACTION = "transaction"
     ATM_TRANSACTION = "atm_transaction"
     LOGIN_ACTIVITY = "login_activity"
@@ -40,6 +42,7 @@ class Tables:
     ACCOUNT_PORTFOLIO_SUMMARY = "account_portfolio_summary"
     ACCOUNT_BALANCE_SUMMARY = "account_balance_summary"
 
+    EXCHANGE_RATE_SUMMARY = "exchange_rate_summary"     
     DAILY_TRANSACTION_SUMMARY = "daily_transaction_summary"
     BRANCH_PERFORMANCE = "branch_performance"
     FRAUD_SUMMARY = "fraud_summary"

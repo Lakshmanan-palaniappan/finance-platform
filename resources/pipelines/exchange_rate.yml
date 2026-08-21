@@ -1,19 +1,33 @@
 resources:
   pipelines:
-    bronze_exchange_rate:
-      name: exchange-rate-pipeline
+
+    exchange_rate_pipeline:
+
+      name: exchange-rate-end-to-end-pipeline
 
       catalog: ${var.catalog}
-      target: ${var.bronze_schema}
+
+      target: ${var.silver_schema}
 
       serverless: true
+
       development: true
+
       channel: CURRENT
 
       libraries:
+
         - file:
             path: ../../src/finance_bundle/bronze/exchange_rate/exchange_rate_pipeline.py
 
+        - file:
+            path: ../../src/finance_bundle/silver/exchange_rate/exchange_rate_pipeline.py
+
+        # # Add this later when Exchange Rate Gold is created
+        - file:
+            path: ../../src/finance_bundle/gold/exchange_rate/exchange_rate_pipeline.py
+
       environment:
+
         dependencies:
-          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.5-py3-none-any.whl
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.8-py3-none-any.whl
