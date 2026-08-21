@@ -1,0 +1,31 @@
+resources:
+  pipelines:
+
+    transaction_pipeline:
+
+      name: transaction-streaming-pipeline
+
+      catalog: ${var.catalog}
+      schema: ${var.bronze_schema}
+
+      serverless: true
+
+      development: true
+
+      channel: CURRENT
+
+      libraries:
+
+        - file:
+            path: ../../src/finance_bundle/bronze/transaction/transaction_pipeline.py
+
+        - file:
+            path: ../../src/finance_bundle/silver/transaction/transaction_pipeline.py
+
+        - file:
+            path: ../../src/finance_bundle/gold/daily_transaction_summary/daily_transaction_summary_pipeline.py
+
+      environment:
+
+        dependencies:
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.7-py3-none-any.whl
