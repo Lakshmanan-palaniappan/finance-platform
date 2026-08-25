@@ -1,5 +1,4 @@
 from pyspark import pipelines as dp
-from pyspark.sql import functions as F
 
 from finance_bundle.common.catalog import Catalog
 from finance_bundle.common.table_names import Tables
@@ -10,13 +9,26 @@ from finance_bundle.gold.loan.loan_transform import (
 
 
 # ==========================================================
+# TABLES
+# ==========================================================
+
+SILVER_LOAN = Catalog.silver(
+    Tables.LOAN
+)
+
+GOLD_LOAN = Catalog.gold(
+    Tables.LOAN
+)
+
+
+# ==========================================================
 # GOLD LOAN
 # ==========================================================
 
 @dp.materialized_view(
-    name=Catalog.gold(
-        Tables.LOAN
-    ),
+
+    name=GOLD_LOAN,
+
     comment="""
     Gold Loan business-ready table.
 
@@ -27,7 +39,7 @@ from finance_bundle.gold.loan.loan_transform import (
     - Risk category
     - Outstanding ratio
     - Loan performance
-    """
+    """,
 )
 
 @dp.expect(
@@ -69,28 +81,15 @@ from finance_bundle.gold.loan.loan_transform import (
     "outstanding_not_greater_than_loan",
     "outstanding_balance <= loan_amount",
 )
-
 def gold_loan():
 
     # ======================================================
-    # READ SILVER SCD2 TABLE
+    # READ SILVER
     # ======================================================
 
-    df = spark.read.table(
-        Catalog.silver(
-            Tables.LOAN
-        )
+    df = dp.read(
+        SILVER_LOAN
     )
-
-    # ======================================================
-    # CURRENT RECORDS ONLY
-    # ======================================================
-
-    if "__END_AT" in df.columns:
-
-        df = df.filter(
-            F.col("__END_AT").isNull()
-        )
 
     # ======================================================
     # GOLD TRANSFORMATION
