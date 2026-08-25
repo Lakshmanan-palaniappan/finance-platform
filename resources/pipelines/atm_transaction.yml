@@ -23,8 +23,8 @@ resources:
         - file:
             path: ../../src/finance_bundle/silver/atm_transaction/atm_transaction_pipeline.py
 
-        # - file:
-        #     path: ../../src/finance_bundle/gold/atm_transaction/atm_transaction_pipeline.py
+        - file:
+             path: ../../src/finance_bundle/gold/atm_transaction/atm_transaction_pipeline.py
 
       environment:
 
