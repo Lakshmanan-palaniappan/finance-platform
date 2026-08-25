@@ -24,7 +24,7 @@ resources:
             path: ../../src/finance_bundle/silver/loan/loan_pipeline.py
           
         - file:
-            path: ../../src/finance_bundle/gold/loan/loan_pipeline.py
+           path: ../../src/finance_bundle/gold/loan/loan_pipeline.py
 
 
     
@@ -32,4 +32,4 @@ resources:
       environment:
 
         dependencies:
-          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.7-py3-none-any.whl
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.8-py3-none-any.whl
