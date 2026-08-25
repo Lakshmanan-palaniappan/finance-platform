@@ -8,13 +8,8 @@ from finance_bundle.bronze.loan.loan_cdc_ingestion import (
     read_loan_cdc_data,
 )
 
-from finance_bundle.common.catalog import (
-    Catalog,
-)
-
-from finance_bundle.common.table_names import (
-    Tables,
-)
+from finance_bundle.common.catalog import Catalog
+from finance_bundle.common.table_names import Tables
 
 
 # ==========================================================
@@ -22,7 +17,9 @@ from finance_bundle.common.table_names import (
 # ==========================================================
 
 @dp.table(
-    name=Catalog.bronze(Tables.LOAN),
+    name=Catalog.bronze(
+        Tables.LOAN
+    ),
     comment="Bronze Loan master data",
 )
 @dp.expect(
@@ -39,7 +36,9 @@ def loan_bronze():
 # ==========================================================
 
 @dp.table(
-    name=Catalog.bronze(Tables.LOAN_CDC),
+    name=Catalog.bronze(
+        Tables.LOAN_CDC
+    ),
     comment="Bronze Loan CDC events",
 )
 @dp.expect(

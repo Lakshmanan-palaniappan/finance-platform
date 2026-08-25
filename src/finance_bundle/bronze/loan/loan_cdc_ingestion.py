@@ -4,9 +4,9 @@ from pyspark.sql.functions import (
     col,
     current_date,
     current_timestamp,
-    lower,
     regexp_extract,
     trim,
+    lower,
 )
 
 from finance_bundle.common.config import settings
@@ -30,6 +30,10 @@ def read_loan_cdc_data():
         spark.readStream
         .format(settings.AUTOLOADER)
 
+        # ==================================================
+        # File Format
+        # ==================================================
+
         .option(
             "cloudFiles.format",
             settings.FILE_FORMAT,
@@ -40,26 +44,44 @@ def read_loan_cdc_data():
             settings.HEADER,
         )
 
+        # ==================================================
+        # Schema Location
+        # ==================================================
+
         .option(
             "cloudFiles.schemaLocation",
             SchemaLocation.LOAN_CDC,
         )
+
+        # ==================================================
+        # Schema Evolution
+        # ==================================================
 
         .option(
             "cloudFiles.schemaEvolutionMode",
             "addNewColumns",
         )
 
+        # ==================================================
+        # Rescued Data
+        # ==================================================
+
         .option(
             "rescuedDataColumn",
             "_rescued_data",
         )
 
-        .load(CDC.LOAN)
+        # ==================================================
+        # Source
+        # ==================================================
+
+        .load(
+            CDC.LOAN
+        )
     )
 
     # ======================================================
-    # NORMALIZE COLUMN NAMES
+    # Normalize CDC Column Names
     # ======================================================
 
     for column_name in df.columns:
@@ -80,12 +102,12 @@ def read_loan_cdc_data():
             )
 
     # ======================================================
-    # NORMALIZE CDC VALUES
+    # Normalize Entity
     # ======================================================
 
-    df = (
-        df
-        .withColumn(
+    if "entity" in df.columns:
+
+        df = df.withColumn(
             "entity",
             lower(
                 trim(
@@ -93,7 +115,14 @@ def read_loan_cdc_data():
                 )
             ),
         )
-        .withColumn(
+
+    # ======================================================
+    # Normalize Operation
+    # ======================================================
+
+    if "operation" in df.columns:
+
+        df = df.withColumn(
             "operation",
             lower(
                 trim(
@@ -101,43 +130,64 @@ def read_loan_cdc_data():
                 )
             ),
         )
-        .withColumn(
+
+    # ======================================================
+    # Normalize Loan ID
+    # ======================================================
+
+    if "loan_id" in df.columns:
+
+        df = df.withColumn(
             "loan_id",
             trim(
                 col("loan_id")
             ),
         )
-        .withColumn(
+
+    # ======================================================
+    # Normalize Customer ID
+    # ======================================================
+
+    if "customer_id" in df.columns:
+
+        df = df.withColumn(
             "customer_id",
             trim(
                 col("customer_id")
             ),
         )
-        .withColumn(
-            "event_id",
-            trim(
-                col("event_id")
-            ),
-        )
-        .withColumn(
+
+    # ======================================================
+    # Normalize Batch ID
+    # ======================================================
+
+    if "batch_id" in df.columns:
+
+        df = df.withColumn(
             "batch_id",
             trim(
                 col("batch_id")
             ),
         )
-        .withColumn(
-            "source_system",
+
+    # ======================================================
+    # Normalize Event ID
+    # ======================================================
+
+    if "event_id" in df.columns:
+
+        df = df.withColumn(
+            "event_id",
             trim(
-                col("source_system")
+                col("event_id")
             ),
         )
-    )
 
     # ======================================================
-    # METADATA
+    # Metadata
     # ======================================================
 
-    return (
+    df = (
         df
 
         .withColumn(
@@ -174,3 +224,5 @@ def read_loan_cdc_data():
             col("_metadata.file_modification_time"),
         )
     )
+
+    return df

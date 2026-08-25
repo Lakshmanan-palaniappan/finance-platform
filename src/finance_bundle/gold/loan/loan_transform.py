@@ -3,11 +3,29 @@ from pyspark.sql import functions as F
 
 
 # ==========================================================
+# CURRENT LOAN RECORDS
+# ==========================================================
+
+def current_loans(
+    df: DataFrame,
+) -> DataFrame:
+
+    return (
+        df
+        .filter(
+            F.col(
+                "__END_AT"
+            ).isNull()
+        )
+    )
+
+
+# ==========================================================
 # BUSINESS METRICS
 # ==========================================================
 
 def add_loan_metrics(
-    df: DataFrame
+    df: DataFrame,
 ) -> DataFrame:
 
     return (
@@ -15,21 +33,33 @@ def add_loan_metrics(
 
         .withColumn(
             "loan_outstanding_pct",
+
             F.when(
                 F.col("loan_amount") > 0,
+
                 (
-                    F.col("outstanding_balance")
-                    / F.col("loan_amount")
+                    F.col(
+                        "outstanding_balance"
+                    )
+                    /
+                    F.col(
+                        "loan_amount"
+                    )
                 ) * 100,
-            ).otherwise(0.0),
+
+            ).otherwise(
+                F.lit(0.0)
+            ),
         )
 
         .withColumn(
             "emi_completion_pct",
+
             F.when(
                 (
                     F.col("paid_emi")
-                    + F.col("remaining_emi")
+                    +
+                    F.col("remaining_emi")
                 ) > 0,
 
                 (
@@ -37,15 +67,19 @@ def add_loan_metrics(
                     /
                     (
                         F.col("paid_emi")
-                        + F.col("remaining_emi")
+                        +
+                        F.col("remaining_emi")
                     )
                 ) * 100,
 
-            ).otherwise(0.0),
+            ).otherwise(
+                F.lit(0.0)
+            ),
         )
 
         .withColumn(
             "loan_age_days",
+
             F.datediff(
                 F.current_date(),
                 F.col("sanction_date"),
@@ -82,7 +116,7 @@ def add_loan_metrics(
 # ==========================================================
 
 def add_loan_kpis(
-    df: DataFrame
+    df: DataFrame,
 ) -> DataFrame:
 
     return (
@@ -90,15 +124,23 @@ def add_loan_kpis(
 
         .withColumn(
             "outstanding_ratio_pct",
+
             F.when(
                 F.col("loan_amount") > 0,
 
                 (
-                    F.col("outstanding_balance")
-                    / F.col("loan_amount")
+                    F.col(
+                        "outstanding_balance"
+                    )
+                    /
+                    F.col(
+                        "loan_amount"
+                    )
                 ) * 100,
 
-            ).otherwise(0.0),
+            ).otherwise(
+                F.lit(0.0)
+            ),
         )
 
         .withColumn(
@@ -131,7 +173,7 @@ def add_loan_kpis(
 # ==========================================================
 
 def add_business_validation(
-    df: DataFrame
+    df: DataFrame,
 ) -> DataFrame:
 
     return (
@@ -152,7 +194,8 @@ def add_business_validation(
 
             .when(
                 F.col("outstanding_balance")
-                > F.col("loan_amount"),
+                >
+                F.col("loan_amount"),
 
                 "Outstanding balance exceeds loan amount",
             )
@@ -179,12 +222,14 @@ def add_business_validation(
 
             .otherwise(
                 F.lit(None)
-            )
+            ),
         )
 
         .withColumn(
             "_business_rule_valid",
-            F.col("_business_rule_error").isNull(),
+            F.col(
+                "_business_rule_error"
+            ).isNull(),
         )
     )
 
@@ -194,11 +239,15 @@ def add_business_validation(
 # ==========================================================
 
 def transform_loan_gold(
-    silver_df: DataFrame
+    silver_df: DataFrame,
 ) -> DataFrame:
 
-    df = add_loan_metrics(
+    df = current_loans(
         silver_df
+    )
+
+    df = add_loan_metrics(
+        df
     )
 
     df = add_loan_kpis(
@@ -211,9 +260,13 @@ def transform_loan_gold(
 
     return (
         df
+
         .filter(
-            F.col("_business_rule_valid")
+            F.col(
+                "_business_rule_valid"
+            )
         )
+
         .drop(
             "_business_rule_error",
             "_business_rule_valid",

@@ -1,4 +1,20 @@
+"""
+Loan Silver Lakeflow SDP Pipeline.
+
+Bronze Loan
+       +
+Bronze Loan CDC
+       |
+       v
+loan_cdc_source
+       |
+       v
+Silver Loan SCD2
+"""
+
 from pyspark import pipelines as dp
+
+from pyspark.sql import functions as F
 
 from finance_bundle.common.catalog import Catalog
 from finance_bundle.common.table_names import Tables
@@ -6,64 +22,157 @@ from finance_bundle.common.table_names import Tables
 from finance_bundle.silver.loan.loan_transform import (
     transform_loan,
     add_loan_validation,
-    get_valid_records,
     get_quarantine_records,
     prepare_loan_cdc,
 )
 
 
 # ==========================================================
-# SILVER LOAN
+# Table Names
 # ==========================================================
 
-@dp.table(
-    name=Catalog.silver(Tables.LOAN),
-    comment="Cleaned and validated Silver Loan data"
+BRONZE_LOAN = Catalog.bronze(
+    Tables.LOAN
 )
-@dp.expect(
-    "loan_id_not_null",
-    "loan_id IS NOT NULL"
-)
-@dp.expect(
-    "customer_id_not_null",
-    "customer_id IS NOT NULL"
-)
-@dp.expect(
-    "branch_id_not_null",
-    "branch_id IS NOT NULL"
-)
-@dp.expect(
-    "loan_amount_valid",
-    "loan_amount >= 0"
-)
-@dp.expect(
-    "interest_rate_valid",
-    "interest_rate >= 0"
-)
-@dp.expect(
-    "tenure_valid",
-    "tenure_years > 0"
-)
-def silver_loan():
 
-    bronze_df = (
-        spark.readStream
-        .table(
-            Catalog.bronze(Tables.LOAN)
+BRONZE_LOAN_CDC = Catalog.bronze(
+    Tables.LOAN_CDC
+)
+
+SILVER_LOAN = Catalog.silver(
+    Tables.LOAN
+)
+
+SILVER_LOAN_QUARANTINE = Catalog.silver(
+    Tables.LOAN_QUARANTINE
+)
+
+
+# ==========================================================
+# Loan CDC Source
+#
+# EXACT SAME PATTERN AS ACCOUNT
+# ==========================================================
+
+@dp.temporary_view(
+    name="loan_cdc_source",
+)
+def loan_cdc_source():
+
+    # ------------------------------------------------------
+    # Read Loan Master
+    #
+    # IMPORTANT:
+    # This is BATCH / STATIC.
+    # ------------------------------------------------------
+
+    loan_df = dp.read(
+        BRONZE_LOAN
+    )
+
+    # ------------------------------------------------------
+    # Read Loan CDC
+    #
+    # IMPORTANT:
+    # This is STREAMING.
+    # ------------------------------------------------------
+
+    cdc_df = dp.read_stream(
+        BRONZE_LOAN_CDC
+    )
+
+    # ------------------------------------------------------
+    # Prepare Complete CDC Record
+    # ------------------------------------------------------
+
+    return prepare_loan_cdc(
+        cdc_df,
+        loan_df,
+    )
+
+
+# ==========================================================
+# Silver Loan SCD Type 2 Table
+# ==========================================================
+
+dp.create_streaming_table(
+
+    name=SILVER_LOAN,
+
+    comment=(
+        "Silver Loan SCD Type 2 table"
+    ),
+)
+
+
+# ==========================================================
+# AUTO CDC
+# ==========================================================
+
+dp.create_auto_cdc_flow(
+
+    target=SILVER_LOAN,
+
+    source="loan_cdc_source",
+
+    # ------------------------------------------------------
+    # Business Key
+    # ------------------------------------------------------
+
+    keys=[
+        "loan_id",
+    ],
+
+    # ------------------------------------------------------
+    # CDC Ordering
+    #
+    # Account uses batch_id.
+    # Follow the same pattern here.
+    # ------------------------------------------------------
+
+    sequence_by=F.col(
+        "_batch_id"
+    ),
+
+    # ------------------------------------------------------
+    # Delete
+    # ------------------------------------------------------
+
+    apply_as_deletes=(
+        F.col(
+            "_operation"
         )
-    )
+        ==
+        F.lit(
+            "delete"
+        )
+    ),
 
-    transformed_df = transform_loan(
-        bronze_df
-    )
+    # ------------------------------------------------------
+    # Remove CDC Metadata
+    # ------------------------------------------------------
 
-    validated_df = add_loan_validation(
-        transformed_df
-    )
+    except_column_list=[
 
-    return get_valid_records(
-        validated_df
-    )
+        "_operation",
+
+        "_batch_id",
+
+        "_event_id",
+
+        "_entity",
+
+        "_event_timestamp",
+
+        "_change_timestamp",
+    ],
+
+    # ------------------------------------------------------
+    # SCD Type 2
+    # ------------------------------------------------------
+
+    stored_as_scd_type=2,
+)
 
 
 # ==========================================================
@@ -71,59 +180,28 @@ def silver_loan():
 # ==========================================================
 
 @dp.table(
-    name=Catalog.silver(Tables.LOAN_QUARANTINE),
-    comment="Loan records rejected during Silver validation"
+
+    name=SILVER_LOAN_QUARANTINE,
+
+    comment=(
+        "Loan records rejected "
+        "during Silver validation"
+    ),
 )
-def silver_loan_quarantine():
+def loan_quarantine():
 
-    bronze_df = (
-        spark.readStream
-        .table(
-            Catalog.bronze(Tables.LOAN)
-        )
+    df = dp.read_stream(
+        BRONZE_LOAN
     )
 
-    transformed_df = transform_loan(
-        bronze_df
+    df = transform_loan(
+        df
     )
 
-    validated_df = add_loan_validation(
-        transformed_df
+    df = add_loan_validation(
+        df
     )
 
     return get_quarantine_records(
-        validated_df
-    )
-
-
-# ==========================================================
-# PREPARED LOAN CDC
-# ==========================================================
-
-@dp.temporary_view(
-    name="loan_cdc_prepared"
-)
-def loan_cdc_prepared():
-
-    cdc_df = (
-        spark.readStream
-        .table(
-            Catalog.bronze(Tables.LOAN_CDC)
-        )
-    )
-
-    loan_df = (
-        spark.readStream
-        .table(
-            Catalog.bronze(Tables.LOAN)
-        )
-    )
-
-    cleaned_loan_df = transform_loan(
-        loan_df
-    )
-
-    return prepare_loan_cdc(
-        cdc_df,
-        cleaned_loan_df
+        df
     )
