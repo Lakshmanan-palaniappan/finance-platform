@@ -1,19 +1,32 @@
 resources:
   pipelines:
-    bronze_atm_transaction:
-      name: atm-transaction-pipeline
+
+    atm_transaction_pipeline:
+
+      name: atm-transaction-end-to-end-pipeline
 
       catalog: ${var.catalog}
-      target: ${var.bronze_schema}
+
+      target: ${var.silver_schema}
 
       serverless: true
+
       development: true
+
       channel: CURRENT
 
       libraries:
+
         - file:
             path: ../../src/finance_bundle/bronze/atm_transaction/atm_transaction_pipeline.py
 
+        - file:
+            path: ../../src/finance_bundle/silver/atm_transaction/atm_transaction_pipeline.py
+
+        # - file:
+        #     path: ../../src/finance_bundle/gold/atm_transaction/atm_transaction_pipeline.py
+
       environment:
+
         dependencies:
-          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.6-py3-none-any.whl
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.8-py3-none-any.whl

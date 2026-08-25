@@ -28,8 +28,11 @@ class Tables:
     EXCHANGE_RATE_QUARANTINE = "exchange_rate_quarantine"
 
     TRANSACTION = "transaction"
+    
     TRANSACTION_QUARANTINE = "transaction_quarantine"
     ATM_TRANSACTION = "atm_transaction"
+    ATM_TRANSACTION_QUARANTINE = "atm_transaction_quarantine"
+
     LOGIN_ACTIVITY = "login_activity"
     LOGIN_ACTIVITY_QUARANTINE = "login_activity_quarantine"
 
