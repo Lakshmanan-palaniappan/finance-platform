@@ -1,20 +1,32 @@
 resources:
   pipelines:
 
-    bronze_branch:
-      name: branch-pipeline
+    branch_pipeline:
+
+      name: branch-end-to-end-pipeline
 
       catalog: ${var.catalog}
-      target: ${var.bronze_schema}
+
+      target: ${var.silver_schema}
 
       serverless: true
+
       development: true
+
       channel: CURRENT
 
       libraries:
+
         - file:
             path: ../../src/finance_bundle/bronze/branch/branch_pipeline.py
 
+        - file:
+           path: ../../src/finance_bundle/silver/branch/branch_pipeline.py
+
+        - file:
+            path: ../../src/finance_bundle/gold/branch/branch_pipeline.py
+
       environment:
+
         dependencies:
-          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.2-py3-none-any.whl
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.7-py3-none-any.whl

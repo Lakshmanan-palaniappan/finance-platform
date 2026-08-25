@@ -25,10 +25,16 @@ class Tables:
 
     BRANCH = "branch"
     EXCHANGE_RATE = "exchange_rate"
+    EXCHANGE_RATE_QUARANTINE = "exchange_rate_quarantine"
+
     TRANSACTION = "transaction"
+    
     TRANSACTION_QUARANTINE = "transaction_quarantine"
     ATM_TRANSACTION = "atm_transaction"
+    ATM_TRANSACTION_QUARANTINE = "atm_transaction_quarantine"
+
     LOGIN_ACTIVITY = "login_activity"
+    LOGIN_ACTIVITY_QUARANTINE = "login_activity_quarantine"
 
     # ==========================================================
     # Gold
@@ -41,8 +47,10 @@ class Tables:
     ACCOUNT_PORTFOLIO_SUMMARY = "account_portfolio_summary"
     ACCOUNT_BALANCE_SUMMARY = "account_balance_summary"
 
+    EXCHANGE_RATE_SUMMARY = "exchange_rate_summary"     
     DAILY_TRANSACTION_SUMMARY = "daily_transaction_summary"
     BRANCH_PERFORMANCE = "branch_performance"
     FRAUD_SUMMARY = "fraud_summary"
     ATM_SUMMARY = "atm_summary"
     EXECUTIVE_DASHBOARD = "executive_dashboard"
+    FRAUD_LOGIN_SUMMARY = "fraud_login_summary"
