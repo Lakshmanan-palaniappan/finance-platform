@@ -5,7 +5,7 @@ from finance_bundle.common.catalog import Catalog
 from finance_bundle.common.table_names import Tables
 
 from finance_bundle.gold.loan.loan_transform import (
-    transform_loan_gold
+    transform_loan_gold,
 )
 
 
@@ -14,116 +14,88 @@ from finance_bundle.gold.loan.loan_transform import (
 # ==========================================================
 
 @dp.materialized_view(
-    name=Catalog.gold(Tables.LOAN),
+    name=Catalog.gold(
+        Tables.LOAN
+    ),
     comment="""
-    Gold Loan table containing business-ready Loan data,
-    business metrics, KPIs, risk classification and
-    validated business rules.
-    
-    KPI Definitions:
-    
-    loan_outstanding_pct:
-        Outstanding balance as a percentage of loan amount.
-    
-    emi_completion_pct:
-        Percentage of EMIs already paid.
-    
-    outstanding_ratio_pct:
-        Outstanding balance as a percentage of loan amount.
-    
-    risk_category:
-        HIGH when loan is DEFAULTED or loan-to-income ratio >= 5.
-        MEDIUM when loan-to-income ratio >= 3.
-        LOW otherwise.
-    
-    loan_performance:
-        CRITICAL for defaulted loans.
-        GOOD when EMI completion >= 75%.
-        WATCH when EMI completion >= 40%.
-        AT_RISK otherwise.
+    Gold Loan business-ready table.
+
+    Contains:
+    - Loan outstanding percentage
+    - EMI completion percentage
+    - Loan age
+    - Risk category
+    - Outstanding ratio
+    - Loan performance
     """
 )
 
-# ==========================================================
-# DATA QUALITY EXPECTATIONS
-# ==========================================================
-
 @dp.expect(
     "loan_id_not_null",
-    "loan_id IS NOT NULL"
+    "loan_id IS NOT NULL",
 )
 
 @dp.expect(
     "customer_id_not_null",
-    "customer_id IS NOT NULL"
+    "customer_id IS NOT NULL",
 )
 
 @dp.expect(
     "branch_id_not_null",
-    "branch_id IS NOT NULL"
+    "branch_id IS NOT NULL",
 )
 
 @dp.expect(
     "loan_amount_valid",
-    "loan_amount >= 0"
+    "loan_amount >= 0",
 )
 
 @dp.expect(
     "interest_rate_valid",
-    "interest_rate >= 0"
+    "interest_rate >= 0",
 )
 
 @dp.expect(
     "tenure_valid",
-    "tenure_years > 0"
+    "tenure_years > 0",
 )
 
 @dp.expect(
     "outstanding_balance_valid",
-    "outstanding_balance >= 0"
+    "outstanding_balance >= 0",
 )
 
 @dp.expect(
     "outstanding_not_greater_than_loan",
-    "outstanding_balance <= loan_amount"
+    "outstanding_balance <= loan_amount",
 )
 
 def gold_loan():
 
     # ======================================================
-    # READ SILVER LOAN
+    # READ SILVER SCD2 TABLE
     # ======================================================
 
-    silver_df = (
-        spark.read
-        .table(
-            Catalog.silver(Tables.LOAN)
+    df = spark.read.table(
+        Catalog.silver(
+            Tables.LOAN
         )
     )
 
     # ======================================================
-    # SCD TYPE 2
-    # ======================================================
-    # Keep only the current version of each loan.
-    #
-    # IMPORTANT:
-    # If your SCD2 implementation does not generate
-    # _is_current, remove this section or replace it
-    # with the actual current-record column.
+    # CURRENT RECORDS ONLY
     # ======================================================
 
-    if "_is_current" in silver_df.columns:
+    if "__END_AT" in df.columns:
 
-        silver_df = silver_df.filter(
-            F.col("_is_current") == True
+        df = df.filter(
+            F.col("__END_AT").isNull()
         )
 
     # ======================================================
-    # SILVER -> GOLD TRANSFORMATION
+    # GOLD TRANSFORMATION
     # ======================================================
 
-    gold_df = transform_loan_gold(
-        silver_df
+    return transform_loan_gold(
+        df
     )
-
-    return gold_df

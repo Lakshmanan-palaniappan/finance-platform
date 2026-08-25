@@ -6,17 +6,12 @@ from pyspark.sql import functions as F
 # BUSINESS METRICS
 # ==========================================================
 
-def add_loan_metrics(df: DataFrame) -> DataFrame:
-    """
-    Add business metrics and KPIs to Silver Loan data.
-    """
+def add_loan_metrics(
+    df: DataFrame
+) -> DataFrame:
 
     return (
         df
-
-        # ==================================================
-        # OUTSTANDING PERCENTAGE
-        # ==================================================
 
         .withColumn(
             "loan_outstanding_pct",
@@ -25,13 +20,9 @@ def add_loan_metrics(df: DataFrame) -> DataFrame:
                 (
                     F.col("outstanding_balance")
                     / F.col("loan_amount")
-                ) * 100
-            ).otherwise(0.0)
+                ) * 100,
+            ).otherwise(0.0),
         )
-
-        # ==================================================
-        # EMI COMPLETION PERCENTAGE
-        # ==================================================
 
         .withColumn(
             "emi_completion_pct",
@@ -40,6 +31,7 @@ def add_loan_metrics(df: DataFrame) -> DataFrame:
                     F.col("paid_emi")
                     + F.col("remaining_emi")
                 ) > 0,
+
                 (
                     F.col("paid_emi")
                     /
@@ -47,97 +39,95 @@ def add_loan_metrics(df: DataFrame) -> DataFrame:
                         F.col("paid_emi")
                         + F.col("remaining_emi")
                     )
-                ) * 100
-            ).otherwise(0.0)
-        )
+                ) * 100,
 
-        # ==================================================
-        # LOAN AGE
-        # ==================================================
+            ).otherwise(0.0),
+        )
 
         .withColumn(
             "loan_age_days",
             F.datediff(
                 F.current_date(),
-                F.col("sanction_date")
-            )
+                F.col("sanction_date"),
+            ),
         )
-
-        # ==================================================
-        # RISK CATEGORY
-        # ==================================================
 
         .withColumn(
             "risk_category",
+
             F.when(
                 F.col("status") == "DEFAULTED",
-                "HIGH"
+                "HIGH",
             )
+
             .when(
                 F.col("loan_to_income_ratio") >= 5,
-                "HIGH"
+                "HIGH",
             )
+
             .when(
                 F.col("loan_to_income_ratio") >= 3,
-                "MEDIUM"
+                "MEDIUM",
             )
-            .otherwise("LOW")
+
+            .otherwise(
+                "LOW"
+            ),
         )
     )
 
 
 # ==========================================================
-# KPI METRICS
+# KPIs
 # ==========================================================
 
-def add_loan_kpis(df: DataFrame) -> DataFrame:
-    """
-    Add loan-level KPI indicators.
-    """
+def add_loan_kpis(
+    df: DataFrame
+) -> DataFrame:
 
     return (
         df
-
-        # --------------------------------------------------
-        # Outstanding ratio
-        # --------------------------------------------------
 
         .withColumn(
             "outstanding_ratio_pct",
             F.when(
                 F.col("loan_amount") > 0,
+
                 (
                     F.col("outstanding_balance")
                     / F.col("loan_amount")
-                ) * 100
-            ).otherwise(0.0)
-        )
+                ) * 100,
 
-        # --------------------------------------------------
-        # Loan performance status
-        # --------------------------------------------------
+            ).otherwise(0.0),
+        )
 
         .withColumn(
             "loan_performance",
+
             F.when(
                 F.col("status") == "DEFAULTED",
-                "CRITICAL"
+                "CRITICAL",
             )
+
             .when(
                 F.col("emi_completion_pct") >= 75,
-                "GOOD"
+                "GOOD",
             )
+
             .when(
                 F.col("emi_completion_pct") >= 40,
-                "WATCH"
+                "WATCH",
             )
-            .otherwise("AT_RISK")
+
+            .otherwise(
+                "AT_RISK"
+            ),
         )
     )
 
 
 # ==========================================================
-# BUSINESS RULE VALIDATION
+# BUSINESS VALIDATION
 # ==========================================================
 
 def add_business_validation(
@@ -152,46 +142,49 @@ def add_business_validation(
 
             F.when(
                 F.col("loan_amount") < 0,
-                "Loan amount cannot be negative"
+                "Loan amount cannot be negative",
             )
 
             .when(
                 F.col("outstanding_balance") < 0,
-                "Outstanding balance cannot be negative"
+                "Outstanding balance cannot be negative",
             )
 
             .when(
                 F.col("outstanding_balance")
                 > F.col("loan_amount"),
-                "Outstanding balance exceeds loan amount"
+
+                "Outstanding balance exceeds loan amount",
             )
 
             .when(
                 F.col("interest_rate") < 0,
-                "Interest rate cannot be negative"
+                "Interest rate cannot be negative",
             )
 
             .when(
                 F.col("tenure_years") <= 0,
-                "Tenure must be greater than zero"
+                "Tenure must be greater than zero",
             )
 
             .when(
                 F.col("paid_emi") < 0,
-                "Paid EMI cannot be negative"
+                "Paid EMI cannot be negative",
             )
 
             .when(
                 F.col("remaining_emi") < 0,
-                "Remaining EMI cannot be negative"
+                "Remaining EMI cannot be negative",
             )
 
-            .otherwise(None)
+            .otherwise(
+                F.lit(None)
+            )
         )
 
         .withColumn(
             "_business_rule_valid",
-            F.col("_business_rule_error").isNull()
+            F.col("_business_rule_error").isNull(),
         )
     )
 
@@ -203,41 +196,26 @@ def add_business_validation(
 def transform_loan_gold(
     silver_df: DataFrame
 ) -> DataFrame:
-    """
-    Complete Silver -> Gold Loan transformation.
-    """
 
-    df = silver_df
+    df = add_loan_metrics(
+        silver_df
+    )
 
-    # ------------------------------------------------------
-    # Add business metrics
-    # ------------------------------------------------------
+    df = add_loan_kpis(
+        df
+    )
 
-    df = add_loan_metrics(df)
-
-    # ------------------------------------------------------
-    # Add KPIs
-    # ------------------------------------------------------
-
-    df = add_loan_kpis(df)
-
-    # ------------------------------------------------------
-    # Validate business rules
-    # ------------------------------------------------------
-
-    df = add_business_validation(df)
-
-    # ------------------------------------------------------
-    # Keep valid Gold records
-    # ------------------------------------------------------
+    df = add_business_validation(
+        df
+    )
 
     return (
         df
         .filter(
-            F.col("_business_rule_valid") == True
+            F.col("_business_rule_valid")
         )
         .drop(
             "_business_rule_error",
-            "_business_rule_valid"
+            "_business_rule_valid",
         )
     )

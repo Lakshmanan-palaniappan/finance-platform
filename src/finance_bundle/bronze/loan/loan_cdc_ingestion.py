@@ -4,9 +4,9 @@ from pyspark.sql.functions import (
     col,
     current_date,
     current_timestamp,
+    lower,
     regexp_extract,
     trim,
-    lower,
 )
 
 from finance_bundle.common.config import settings
@@ -58,9 +58,9 @@ def read_loan_cdc_data():
         .load(CDC.LOAN)
     )
 
-    # ==========================================================
-    # Normalize column names
-    # ==========================================================
+    # ======================================================
+    # NORMALIZE COLUMN NAMES
+    # ======================================================
 
     for column_name in df.columns:
 
@@ -79,60 +79,82 @@ def read_loan_cdc_data():
                 normalized,
             )
 
-    # ==========================================================
-    # Normalize CDC values
-    # ==========================================================
+    # ======================================================
+    # NORMALIZE CDC VALUES
+    # ======================================================
 
     df = (
         df
         .withColumn(
             "entity",
-            lower(trim(col("entity"))),
+            lower(
+                trim(
+                    col("entity")
+                )
+            ),
         )
         .withColumn(
             "operation",
-            lower(trim(col("operation"))),
+            lower(
+                trim(
+                    col("operation")
+                )
+            ),
         )
         .withColumn(
             "loan_id",
-            trim(col("loan_id")),
+            trim(
+                col("loan_id")
+            ),
         )
         .withColumn(
             "customer_id",
-            trim(col("customer_id")),
+            trim(
+                col("customer_id")
+            ),
         )
         .withColumn(
             "event_id",
-            trim(col("event_id")),
+            trim(
+                col("event_id")
+            ),
         )
         .withColumn(
             "batch_id",
-            trim(col("batch_id")),
+            trim(
+                col("batch_id")
+            ),
         )
         .withColumn(
             "source_system",
-            trim(col("source_system")),
+            trim(
+                col("source_system")
+            ),
         )
     )
 
-    # ==========================================================
-    # Metadata
-    # ==========================================================
+    # ======================================================
+    # METADATA
+    # ======================================================
 
-    df = (
+    return (
         df
+
         .withColumn(
             "ingestion_timestamp",
             current_timestamp(),
         )
+
         .withColumn(
             "ingestion_date",
             current_date(),
         )
+
         .withColumn(
             "source_file",
             col("_metadata.file_path"),
         )
+
         .withColumn(
             "file_name",
             regexp_extract(
@@ -141,14 +163,14 @@ def read_loan_cdc_data():
                 1,
             ),
         )
+
         .withColumn(
             "file_size",
             col("_metadata.file_size"),
         )
+
         .withColumn(
             "file_modification_time",
             col("_metadata.file_modification_time"),
         )
     )
-
-    return df
