@@ -25,7 +25,7 @@ LOAN_COLUMNS = [
 
 
 # ==========================================================
-# TRANSFORM NORMAL LOAN
+# NORMAL LOAN TRANSFORMATION
 # ==========================================================
 
 def transform_loan(df: DataFrame) -> DataFrame:
@@ -38,65 +38,59 @@ def transform_loan(df: DataFrame) -> DataFrame:
         "status",
     ]
 
-    # ------------------------------------------------------
-    # Trim + normalize empty strings
-    # ------------------------------------------------------
-
     for column_name in string_columns:
 
         df = df.withColumn(
             column_name,
-            F.trim(F.col(column_name))
+            F.trim(
+                F.col(column_name)
+            ),
         )
 
         df = df.withColumn(
             column_name,
             F.when(
                 F.col(column_name) == "",
-                F.lit(None)
+                F.lit(None),
             ).otherwise(
                 F.col(column_name)
-            )
+            ),
         )
 
-    # ------------------------------------------------------
-    # Standardize values
-    # ------------------------------------------------------
+    # ======================================================
+    # STANDARDIZE
+    # ======================================================
 
     df = (
         df
         .withColumn(
             "loan_type",
-            F.upper(F.col("loan_type"))
+            F.upper(
+                F.col("loan_type")
+            ),
         )
         .withColumn(
             "status",
-            F.upper(F.col("status"))
+            F.upper(
+                F.col("status")
+            ),
         )
     )
-
-    # ------------------------------------------------------
-    # Standardize loan types
-    # ------------------------------------------------------
 
     df = df.withColumn(
         "loan_type",
         F.when(
             F.col("loan_type") == "HOME",
-            F.lit("HOME LOAN")
+            "HOME LOAN",
         )
         .when(
             F.col("loan_type") == "PERSONAL",
-            F.lit("PERSONAL LOAN")
+            "PERSONAL LOAN",
         )
         .otherwise(
             F.col("loan_type")
-        )
+        ),
     )
-
-    # ------------------------------------------------------
-    # Standardize status
-    # ------------------------------------------------------
 
     df = df.withColumn(
         "status",
@@ -104,75 +98,59 @@ def transform_loan(df: DataFrame) -> DataFrame:
             F.col("status").isin(
                 "ACTIVE",
                 "CLOSED",
-                "DEFAULTED"
+                "DEFAULTED",
             ),
-            F.col("status")
+            F.col("status"),
         )
         .otherwise(
-            F.lit("UNKNOWN")
-        )
+            "UNKNOWN"
+        ),
     )
 
-    # ------------------------------------------------------
-    # Cast numeric/date fields
-    # ------------------------------------------------------
+    # ======================================================
+    # CAST
+    # ======================================================
 
     df = (
         df
         .withColumn(
             "loan_amount",
-            F.col("loan_amount").cast("double")
+            F.col("loan_amount").cast("double"),
         )
         .withColumn(
             "interest_rate",
-            F.col("interest_rate").cast("double")
+            F.col("interest_rate").cast("double"),
         )
         .withColumn(
             "tenure_years",
-            F.col("tenure_years").cast("int")
+            F.col("tenure_years").cast("int"),
         )
         .withColumn(
             "monthly_emi",
-            F.col("monthly_emi").cast("double")
+            F.col("monthly_emi").cast("double"),
         )
         .withColumn(
             "paid_emi",
-            F.col("paid_emi").cast("int")
+            F.col("paid_emi").cast("int"),
         )
         .withColumn(
             "remaining_emi",
-            F.col("remaining_emi").cast("int")
+            F.col("remaining_emi").cast("int"),
         )
         .withColumn(
             "outstanding_balance",
-            F.col("outstanding_balance").cast("double")
+            F.col("outstanding_balance").cast("double"),
         )
         .withColumn(
             "loan_to_income_ratio",
-            F.col("loan_to_income_ratio").cast("double")
+            F.col("loan_to_income_ratio").cast("double"),
         )
         .withColumn(
             "sanction_date",
-            F.to_date(F.col("sanction_date"))
+            F.to_date(
+                F.col("sanction_date")
+            ),
         )
-    )
-
-    # ------------------------------------------------------
-    # Normalize nullable fields
-    # ------------------------------------------------------
-
-    df = df.fillna(
-        {
-            "loan_type": "UNKNOWN",
-            "status": "UNKNOWN",
-            "loan_amount": 0.0,
-            "interest_rate": 0.0,
-            "monthly_emi": 0.0,
-            "paid_emi": 0,
-            "remaining_emi": 0,
-            "outstanding_balance": 0.0,
-            "loan_to_income_ratio": 0.0,
-        }
     )
 
     return df
@@ -192,49 +170,43 @@ def add_loan_validation(df: DataFrame) -> DataFrame:
 
             F.when(
                 F.col("loan_id").isNull(),
-                F.lit("loan_id is NULL")
+                "loan_id is NULL",
             )
 
             .when(
                 F.col("customer_id").isNull(),
-                F.lit("customer_id is NULL")
+                "customer_id is NULL",
             )
 
             .when(
                 F.col("branch_id").isNull(),
-                F.lit("branch_id is NULL")
+                "branch_id is NULL",
             )
 
             .when(
                 F.col("loan_amount") < 0,
-                F.lit("loan_amount is negative")
+                "loan_amount is negative",
             )
 
             .when(
                 F.col("interest_rate") < 0,
-                F.lit("interest_rate is negative")
+                "interest_rate is negative",
             )
 
             .when(
                 F.col("tenure_years") <= 0,
-                F.lit(
-                    "tenure_years must be greater than zero"
-                )
+                "tenure_years must be greater than zero",
             )
 
             .when(
                 F.col("outstanding_balance") < 0,
-                F.lit(
-                    "outstanding_balance is negative"
-                )
+                "outstanding_balance is negative",
             )
 
             .when(
                 F.col("outstanding_balance")
                 > F.col("loan_amount"),
-                F.lit(
-                    "outstanding_balance exceeds loan_amount"
-                )
+                "outstanding_balance exceeds loan amount",
             )
 
             .otherwise(
@@ -244,7 +216,7 @@ def add_loan_validation(df: DataFrame) -> DataFrame:
 
         .withColumn(
             "_is_valid",
-            F.col("_validation_error").isNull()
+            F.col("_validation_error").isNull(),
         )
     )
 
@@ -257,23 +229,27 @@ def get_valid_records(df: DataFrame) -> DataFrame:
 
     return (
         df
-        .filter(F.col("_is_valid"))
+        .filter(
+            F.col("_is_valid")
+        )
         .drop(
             "_validation_error",
-            "_is_valid"
+            "_is_valid",
         )
     )
 
 
 # ==========================================================
-# QUARANTINE RECORDS
+# QUARANTINE
 # ==========================================================
 
 def get_quarantine_records(df: DataFrame) -> DataFrame:
 
     return (
         df
-        .filter(~F.col("_is_valid"))
+        .filter(
+            ~F.col("_is_valid")
+        )
     )
 
 
@@ -283,16 +259,20 @@ def get_quarantine_records(df: DataFrame) -> DataFrame:
 
 def prepare_loan_cdc(
     cdc_df: DataFrame,
-    loan_df: DataFrame
+    loan_df: DataFrame,
 ) -> DataFrame:
 
     # ------------------------------------------------------
-    # Clean master Loan
+    # Clean master loan
     # ------------------------------------------------------
 
     loan_df = (
-        transform_loan(loan_df)
-        .select(*LOAN_COLUMNS)
+        transform_loan(
+            loan_df
+        )
+        .select(
+            *LOAN_COLUMNS
+        )
     )
 
     # ------------------------------------------------------
@@ -308,57 +288,57 @@ def prepare_loan_cdc(
                 F.trim(
                     F.col("operation")
                 )
-            )
+            ),
         )
 
         .withColumn(
             "loan_id",
             F.trim(
                 F.col("loan_id")
-            )
+            ),
         )
 
         .withColumn(
             "customer_id",
             F.trim(
                 F.col("customer_id")
-            )
+            ),
         )
 
         .withColumn(
             "event_timestamp",
             F.to_timestamp(
                 F.col("event_timestamp")
-            )
+            ),
         )
 
         .withColumn(
             "change_timestamp",
             F.to_timestamp(
                 F.col("change_timestamp")
-            )
+            ),
         )
     )
 
     # ------------------------------------------------------
-    # Join CDC with current Loan master
+    # JOIN CDC + MASTER
     # ------------------------------------------------------
 
-    joined_df = (
+    joined = (
         cdc_df.alias("cdc")
         .join(
             loan_df.alias("loan"),
             F.col("cdc.loan_id")
             == F.col("loan.loan_id"),
-            "left"
+            "left",
         )
     )
 
     # ------------------------------------------------------
-    # Build complete CDC record
+    # COMPLETE CDC RECORD
     # ------------------------------------------------------
 
-    result_df = joined_df.select(
+    return joined.select(
 
         F.col("cdc.loan_id").alias(
             "loan_id"
@@ -366,7 +346,7 @@ def prepare_loan_cdc(
 
         F.coalesce(
             F.col("cdc.customer_id"),
-            F.col("loan.customer_id")
+            F.col("loan.customer_id"),
         ).alias(
             "customer_id"
         ),
@@ -403,10 +383,9 @@ def prepare_loan_cdc(
             "remaining_emi"
         ),
 
-        # CDC new balance overrides master value
         F.coalesce(
             F.col("cdc.new_balance").cast("double"),
-            F.col("loan.outstanding_balance")
+            F.col("loan.outstanding_balance"),
         ).alias(
             "outstanding_balance"
         ),
@@ -423,21 +402,20 @@ def prepare_loan_cdc(
             "sanction_date"
         ),
 
-        # CDC new status overrides master value
         F.coalesce(
             F.upper(
                 F.trim(
                     F.col("cdc.new_status")
                 )
             ),
-            F.col("loan.status")
+            F.col("loan.status"),
         ).alias(
             "status"
         ),
 
-        # --------------------------------------------------
-        # CDC metadata
-        # --------------------------------------------------
+        # ==================================================
+        # CDC METADATA
+        # ==================================================
 
         F.col("cdc.operation").alias(
             "operation"
@@ -462,10 +440,8 @@ def prepare_loan_cdc(
         F.coalesce(
             F.col("cdc.change_timestamp"),
             F.col("cdc.event_timestamp"),
-            F.current_timestamp()
+            F.current_timestamp(),
         ).alias(
             "change_timestamp"
-        )
+        ),
     )
-
-    return result_df

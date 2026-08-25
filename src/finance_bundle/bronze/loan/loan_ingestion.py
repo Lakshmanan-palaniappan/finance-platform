@@ -1,18 +1,23 @@
 from pyspark.sql import SparkSession
+
 from pyspark.sql.functions import (
     col,
-    current_timestamp,
     current_date,
+    current_timestamp,
     regexp_extract,
     expr,
 )
 
 from finance_bundle.common.config import settings
+
 from finance_bundle.common.paths import (
     LOAN_INPUT_PATH,
     LOAN_SCHEMA_PATH,
 )
-from finance_bundle.schemas.loan_schema import LOAN_SCHEMA_HINTS
+
+from finance_bundle.schemas.loan_schema import (
+    LOAN_SCHEMA_HINTS,
+)
 
 
 def read_loan_data():
@@ -28,10 +33,6 @@ def read_loan_data():
         spark.readStream
         .format(settings.AUTOLOADER)
 
-        # ----------------------------------------------
-        # Source format
-        # ----------------------------------------------
-
         .option(
             "cloudFiles.format",
             settings.FILE_FORMAT,
@@ -42,18 +43,10 @@ def read_loan_data():
             settings.HEADER,
         )
 
-        # ----------------------------------------------
-        # Auto Loader schema state
-        # ----------------------------------------------
-
         .option(
             "cloudFiles.schemaLocation",
             LOAN_SCHEMA_PATH,
         )
-
-        # ----------------------------------------------
-        # Custom schema + schema evolution
-        # ----------------------------------------------
 
         .option(
             "cloudFiles.schemaHints",
@@ -65,27 +58,15 @@ def read_loan_data():
             settings.SCHEMA_EVOLUTION,
         )
 
-        # ----------------------------------------------
-        # Rescue unexpected values
-        # ----------------------------------------------
-
         .option(
             "rescuedDataColumn",
             "_rescued_data",
         )
 
-        # ----------------------------------------------
-        # Source path
-        # ----------------------------------------------
-
         .load(LOAN_INPUT_PATH)
     )
 
-    # ----------------------------------------------
-    # Ingestion metadata
-    # ----------------------------------------------
-
-    df = (
+    return (
         df
         .withColumn(
             "ingestion_timestamp",
@@ -112,5 +93,3 @@ def read_loan_data():
             ),
         )
     )
-
-    return df

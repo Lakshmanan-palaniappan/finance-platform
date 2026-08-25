@@ -1,5 +1,9 @@
 from pyspark import pipelines as dp
-from pyspark.sql.functions import col, expr
+
+from pyspark.sql.functions import (
+    col,
+    expr,
+)
 
 from finance_bundle.common.catalog import Catalog
 from finance_bundle.common.table_names import Tables
@@ -14,11 +18,13 @@ from finance_bundle.silver.loan.loan_transform import (
 
 
 # ==========================================================
-# 1. NORMAL LOAN SILVER
+# NORMAL LOAN VALIDATION
 # ==========================================================
 
 @dp.table(
-    name=Catalog.silver(Tables.LOAN_VALIDATED),
+    name=Catalog.silver(
+        Tables.LOAN_VALIDATED
+    ),
     comment="Cleaned and validated Loan records",
 )
 @dp.expect(
@@ -48,7 +54,9 @@ from finance_bundle.silver.loan.loan_transform import (
 def loan_validated():
 
     df = dp.read_stream(
-        Catalog.bronze(Tables.LOAN)
+        Catalog.bronze(
+            Tables.LOAN
+        )
     )
 
     df = transform_loan(df)
@@ -59,17 +67,21 @@ def loan_validated():
 
 
 # ==========================================================
-# 2. LOAN QUARANTINE
+# QUARANTINE
 # ==========================================================
 
 @dp.table(
-    name=Catalog.silver(Tables.LOAN_QUARANTINE),
+    name=Catalog.silver(
+        Tables.LOAN_QUARANTINE
+    ),
     comment="Rejected Loan records",
 )
 def loan_quarantine():
 
     df = dp.read_stream(
-        Catalog.bronze(Tables.LOAN)
+        Catalog.bronze(
+            Tables.LOAN
+        )
     )
 
     df = transform_loan(df)
@@ -80,21 +92,24 @@ def loan_quarantine():
 
 
 # ==========================================================
-# 3. PREPARE CDC
+# CDC PREPARATION
 # ==========================================================
 
 @dp.temporary_view(
     name="loan_cdc_prepared",
-    comment="Prepared Loan CDC records for SCD2",
 )
 def loan_cdc_prepared():
 
     cdc_df = dp.read_stream(
-        Catalog.bronze(Tables.LOAN_CDC)
+        Catalog.bronze(
+            Tables.LOAN_CDC
+        )
     )
 
     loan_df = dp.read_stream(
-        Catalog.bronze(Tables.LOAN)
+        Catalog.bronze(
+            Tables.LOAN
+        )
     )
 
     return prepare_loan_cdc(
@@ -104,21 +119,26 @@ def loan_cdc_prepared():
 
 
 # ==========================================================
-# 4. CREATE SCD2 TARGET
+# SILVER LOAN SCD2 TARGET
 # ==========================================================
 
 dp.create_streaming_table(
-    name=Catalog.silver(Tables.LOAN),
+    name=Catalog.silver(
+        Tables.LOAN
+    ),
     comment="Silver Loan SCD Type 2 table",
 )
 
 
 # ==========================================================
-# 5. CDC → SILVER LOAN SCD2
+# CDC → SILVER
 # ==========================================================
 
 dp.create_auto_cdc_flow(
-    target=Catalog.silver(Tables.LOAN),
+
+    target=Catalog.silver(
+        Tables.LOAN
+    ),
 
     source="loan_cdc_prepared",
 
@@ -129,6 +149,12 @@ dp.create_auto_cdc_flow(
     sequence_by=col(
         "change_timestamp"
     ),
+
+    # ------------------------------------------------------
+    # IMPORTANT FOR PARTIAL CDC
+    # ------------------------------------------------------
+
+    ignore_null_updates=True,
 
     apply_as_deletes=expr(
         "operation = 'delete'"
