@@ -1,0 +1,31 @@
+resources:
+  pipelines:
+
+    login_activity_pipeline:
+
+      name: login-activity-streaming-pipeline
+
+      catalog: ${var.catalog}
+      schema: ${var.bronze_schema}
+
+      serverless: true
+
+      development: true
+
+      channel: CURRENT
+
+      libraries:
+
+        - file:
+            path: ../../src/finance_bundle/bronze/login_activity/login_activity_pipeline.py
+
+        - file:
+            path: ../../src/finance_bundle/silver/login_activity/login_activity_pipeline.py
+
+        - file:
+            path: ../../src/finance_bundle/gold/fraud_login_summary/fraud_login_summary_pipeline.py
+
+      environment:
+
+        dependencies:
+          - ${workspace.artifact_path}/.internal/finance_bundle-0.0.8-py3-none-any.whl

@@ -29,10 +29,12 @@ class Tables:
 
     TRANSACTION = "transaction"
     
+    TRANSACTION_QUARANTINE = "transaction_quarantine"
     ATM_TRANSACTION = "atm_transaction"
     ATM_TRANSACTION_QUARANTINE = "atm_transaction_quarantine"
 
     LOGIN_ACTIVITY = "login_activity"
+    LOGIN_ACTIVITY_QUARANTINE = "login_activity_quarantine"
 
     # ==========================================================
     # Gold
@@ -51,3 +53,4 @@ class Tables:
     FRAUD_SUMMARY = "fraud_summary"
     ATM_SUMMARY = "atm_summary"
     EXECUTIVE_DASHBOARD = "executive_dashboard"
+    FRAUD_LOGIN_SUMMARY = "fraud_login_summary"

@@ -85,6 +85,7 @@ class Bronze:
     LOAN = f"{ROOT}/loan"
     CARD = f"{ROOT}/card"
     TRANSACTION = f"{ROOT}/transaction"
+    LOGIN_ACTIVITY = f"{ROOT}/login_activity"
 
 
 # ==========================================================
@@ -99,6 +100,8 @@ class Silver:
     ACCOUNT = f"{ROOT}/account"
     CUSTOMER_KYC = f"{ROOT}/customer_kyc"
     LOAN = f"{ROOT}/loan"
+    TRANSACTION = f"{ROOT}/transaction"
+    LOGIN_ACTIVITY = f"{ROOT}/login_activity"
 
 
 # ==========================================================
@@ -130,6 +133,10 @@ class Gold:
     BRANCH_PERFORMANCE = (
         f"{ROOT}/branch_performance"
     )
+    
+    FRAUD_LOGIN_SUMMARY = (
+        f"{ROOT}/fraud_login_summary"
+    )
 
 
 # ==========================================================
@@ -144,6 +151,8 @@ class Quarantine:
     ACCOUNT = f"{ROOT}/account"
     CUSTOMER_KYC = f"{ROOT}/customer_kyc"
     LOAN = f"{ROOT}/loan"
+    TRANSACTION = f"{ROOT}/transaction"
+    LOGIN_ACTIVITY = f"{ROOT}/login_activity"
 
 
 # ==========================================================
@@ -396,4 +405,39 @@ CUSTOMER_KYC_SCHEMA_PATH = (
 
 CUSTOMER_KYC_CHECKPOINT_PATH = (
     Checkpoint.CUSTOMER_KYC
+)
+
+
+# ==========================================================
+# Transaction Streaming Pipeline
+# ==========================================================
+
+TRANSACTION_INPUT_PATH = (
+    Streaming.TRANSACTION
+)
+
+TRANSACTION_SCHEMA_PATH = (
+    SchemaLocation.TRANSACTION
+)
+
+TRANSACTION_CHECKPOINT_PATH = (
+    Checkpoint.TRANSACTION
+)
+
+
+
+# ==========================================================
+# Login Activity Streaming Pipeline
+# ==========================================================
+
+LOGIN_ACTIVITY_INPUT_PATH = (
+    Streaming.LOGIN
+)
+
+LOGIN_ACTIVITY_SCHEMA_PATH = (
+    SchemaLocation.LOGIN
+)
+
+LOGIN_ACTIVITY_CHECKPOINT_PATH = (
+    Checkpoint.LOGIN
 )
