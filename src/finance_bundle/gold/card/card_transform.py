@@ -6,18 +6,20 @@ from finance_bundle.common.table_names import Tables
 
 
 # ==========================================================
-# Read Silver Card
+# READ SILVER CARD
 # ==========================================================
 
 def read_silver_card():
 
     return dp.read(
-        Catalog.silver(Tables.CARD)
+        Catalog.silver(
+            Tables.CARD
+        )
     )
 
 
 # ==========================================================
-# Get Current Card Records
+# GET CURRENT CARD RECORDS
 # ==========================================================
 
 def get_current_cards(df):
@@ -38,13 +40,18 @@ def get_current_cards(df):
 
 
 # ==========================================================
-# Apply Business Rules
+# APPLY BUSINESS RULES
 # ==========================================================
 
 def apply_business_rules(df):
 
     return (
+
         df
+
+        # --------------------------------------------------
+        # Standardized dimensions
+        # --------------------------------------------------
 
         .withColumn(
             "card_status",
@@ -52,7 +59,7 @@ def apply_business_rules(df):
                 F.trim(
                     F.col("status")
                 )
-            ),
+            )
         )
 
         .withColumn(
@@ -61,7 +68,7 @@ def apply_business_rules(df):
                 F.trim(
                     F.col("network")
                 )
-            ),
+            )
         )
 
         .withColumn(
@@ -70,59 +77,68 @@ def apply_business_rules(df):
                 F.trim(
                     F.col("card_type")
                 )
-            ),
+            )
         )
+
+        # --------------------------------------------------
+        # Status flags
+        # --------------------------------------------------
 
         .withColumn(
             "is_active",
             F.when(
                 F.col("card_status") == "ACTIVE",
-                1,
-            ).otherwise(0),
+                1
+            ).otherwise(0)
         )
 
         .withColumn(
             "is_blocked",
             F.when(
                 F.col("card_status") == "BLOCKED",
-                1,
-            ).otherwise(0),
+                1
+            ).otherwise(0)
         )
 
         .withColumn(
             "is_inactive",
             F.when(
                 F.col("card_status") == "INACTIVE",
-                1,
-            ).otherwise(0),
+                1
+            ).otherwise(0)
         )
 
         .withColumn(
             "is_expired",
             F.when(
-                F.col("expiry_date") < F.current_date(),
-                1,
-            ).otherwise(0),
+                F.col("card_status") == "EXPIRED",
+                1
+            ).otherwise(0)
         )
     )
 
 
 # ==========================================================
-# Create Card Gold Metrics
+# CREATE CARD GOLD METRICS
 # ==========================================================
 
 def create_card_metrics(df):
 
     return (
+
         df
 
         .groupBy(
             "card_category",
             "card_network",
-            "card_status",
+            "card_status"
         )
 
         .agg(
+
+            # ------------------------------------------------
+            # Card counts
+            # ------------------------------------------------
 
             F.countDistinct(
                 "card_id"
@@ -160,6 +176,10 @@ def create_card_metrics(df):
                 "expired_cards"
             ),
 
+            # ------------------------------------------------
+            # Credit limit
+            # ------------------------------------------------
+
             F.sum(
                 "credit_limit"
             ).alias(
@@ -178,6 +198,10 @@ def create_card_metrics(df):
                 "max_credit_limit"
             ),
 
+            # ------------------------------------------------
+            # Daily limit
+            # ------------------------------------------------
+
             F.sum(
                 "daily_limit"
             ).alias(
@@ -194,36 +218,53 @@ def create_card_metrics(df):
                 "daily_limit"
             ).alias(
                 "max_daily_limit"
-            ),
+            )
         )
     )
 
 
 # ==========================================================
-# Final Gold Transformation
+# FINAL GOLD TRANSFORMATION
 # ==========================================================
 
 def transform_card_gold():
 
+    # ------------------------------------------------------
+    # Silver
+    # ------------------------------------------------------
+
     silver_df = read_silver_card()
+
+    # ------------------------------------------------------
+    # Only current SCD2 records
+    # ------------------------------------------------------
 
     current_df = get_current_cards(
         silver_df
     )
 
+    # ------------------------------------------------------
+    # Business rules
+    # ------------------------------------------------------
+
     business_df = apply_business_rules(
         current_df
     )
+
+    # ------------------------------------------------------
+    # Aggregation
+    # ------------------------------------------------------
 
     gold_df = create_card_metrics(
         business_df
     )
 
     # ------------------------------------------------------
-    # KPI calculations
+    # Percentage metrics
     # ------------------------------------------------------
 
     gold_df = (
+
         gold_df
 
         .withColumn(
@@ -235,9 +276,9 @@ def transform_card_gold():
                     F.col("active_cards")
                     /
                     F.col("total_cards")
-                ) * 100,
+                ) * 100
 
-            ).otherwise(0),
+            ).otherwise(0)
         )
 
         .withColumn(
@@ -249,9 +290,9 @@ def transform_card_gold():
                     F.col("blocked_cards")
                     /
                     F.col("total_cards")
-                ) * 100,
+                ) * 100
 
-            ).otherwise(0),
+            ).otherwise(0)
         )
 
         .withColumn(
@@ -263,9 +304,9 @@ def transform_card_gold():
                     F.col("expired_cards")
                     /
                     F.col("total_cards")
-                ) * 100,
+                ) * 100
 
-            ).otherwise(0),
+            ).otherwise(0)
         )
     )
 
