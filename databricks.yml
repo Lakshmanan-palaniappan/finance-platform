@@ -57,7 +57,7 @@ targets:
 
     variables:
 
-      catalog: finance_dev_ALJ
+      catalog: finance_catalog_alj
 
       bronze_schema: bronze
 
