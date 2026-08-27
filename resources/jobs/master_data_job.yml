@@ -1,0 +1,41 @@
+resources:
+
+  jobs:
+
+    master_data_job:
+
+      name: finance-master-data-job
+
+      schedule:
+        quartz_cron_expression: "0 0 * * * ?"
+        timezone_id: "Asia/Kolkata"
+        pause_status: UNPAUSED
+
+      max_concurrent_runs: 1
+
+      tasks:
+
+        - task_key: customer_pipeline
+
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.customer_pipeline.id}
+
+        - task_key: account_pipeline
+
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.account_pipeline.id}
+
+        - task_key: customer_kyc_pipeline
+
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.customer_kyc_pipeline.id}
+
+        - task_key: loan_pipeline
+
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.loan_pipeline.id}
+
+        - task_key: card_pipeline
+
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.card_pipeline.id}
