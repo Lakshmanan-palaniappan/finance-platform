@@ -9,7 +9,7 @@ from finance_bundle.gold.card.card_transform import (
 
 
 # ==========================================================
-# Gold Card Materialized View
+# GOLD CARD MATERIALIZED VIEW
 # ==========================================================
 
 @dp.materialized_view(

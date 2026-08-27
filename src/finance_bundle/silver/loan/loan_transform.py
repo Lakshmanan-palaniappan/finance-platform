@@ -2,10 +2,6 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
 
-# ==========================================================
-# LOAN COLUMNS
-# ==========================================================
-
 LOAN_COLUMNS = [
     "loan_id",
     "customer_id",
@@ -25,37 +21,21 @@ LOAN_COLUMNS = [
 
 
 # ==========================================================
-# NORMALIZE LOAN
+# MASTER LOAN TRANSFORMATION
 # ==========================================================
 
-def transform_loan(
-    df: DataFrame,
-) -> DataFrame:
+def transform_loan(df: DataFrame) -> DataFrame:
 
-    # ======================================================
-    # Normalize Column Names
-    # ======================================================
-
-    for column_name in df.columns:
-
+    for c in df.columns:
         normalized = (
-            column_name
-            .strip()
+            c.strip()
             .lower()
             .replace(" ", "_")
             .replace("-", "_")
         )
 
-        if normalized != column_name:
-
-            df = df.withColumnRenamed(
-                column_name,
-                normalized,
-            )
-
-    # ======================================================
-    # String Columns
-    # ======================================================
+        if normalized != c:
+            df = df.withColumnRenamed(c, normalized)
 
     string_columns = [
         "loan_id",
@@ -65,581 +45,260 @@ def transform_loan(
         "status",
     ]
 
-    for column_name in string_columns:
-
-        if column_name in df.columns:
-
+    for c in string_columns:
+        if c in df.columns:
             df = df.withColumn(
-                column_name,
-                F.trim(
-                    F.col(
-                        column_name
-                    ).cast("string")
-                ),
+                c,
+                F.trim(F.col(c).cast("string"))
             )
 
             df = df.withColumn(
-                column_name,
+                c,
                 F.when(
-                    F.col(column_name) == "",
-                    F.lit(None),
-                ).otherwise(
-                    F.col(column_name)
-                ),
+                    F.col(c).isin(
+                        "",
+                        "NULL",
+                        "null",
+                        "N/A",
+                        "NA"
+                    ),
+                    None
+                ).otherwise(F.col(c))
             )
-
-    # ======================================================
-    # Loan Type
-    # ======================================================
 
     if "loan_type" in df.columns:
-
         df = df.withColumn(
             "loan_type",
-            F.upper(
-                F.col("loan_type")
-            ),
+            F.upper(F.col("loan_type"))
         )
 
         df = df.withColumn(
             "loan_type",
-
             F.when(
                 F.col("loan_type") == "HOME",
-                "HOME LOAN",
+                "HOME LOAN"
             )
-
             .when(
                 F.col("loan_type") == "PERSONAL",
-                "PERSONAL LOAN",
+                "PERSONAL LOAN"
             )
-
-            .otherwise(
-                F.col("loan_type")
-            ),
+            .otherwise(F.col("loan_type"))
         )
-
-    # ======================================================
-    # Status
-    # ======================================================
 
     if "status" in df.columns:
-
         df = df.withColumn(
             "status",
-            F.upper(
-                F.col("status")
-            ),
+            F.upper(F.col("status"))
         )
 
-        df = df.withColumn(
-            "status",
+    # Numeric columns
+    numeric_columns = {
+        "loan_amount": "double",
+        "interest_rate": "double",
+        "tenure_years": "int",
+        "monthly_emi": "double",
+        "paid_emi": "int",
+        "remaining_emi": "int",
+        "outstanding_balance": "double",
+        "loan_to_income_ratio": "double",
+    }
 
-            F.when(
-                F.col("status").isin(
-                    "ACTIVE",
-                    "CLOSED",
-                    "DEFAULTED",
-                ),
-                F.col("status"),
+    for c, dtype in numeric_columns.items():
+        if c in df.columns:
+            df = df.withColumn(
+                c,
+                F.col(c).cast(dtype)
             )
 
-            .otherwise(
-                "UNKNOWN"
-            ),
-        )
-
-    # ======================================================
-    # Cast Numeric Columns
-    # ======================================================
-
-    df = (
-        df
-
-        .withColumn(
-            "loan_amount",
-            F.col(
-                "loan_amount"
-            ).cast("double"),
-        )
-
-        .withColumn(
-            "interest_rate",
-            F.col(
-                "interest_rate"
-            ).cast("double"),
-        )
-
-        .withColumn(
-            "tenure_years",
-            F.col(
-                "tenure_years"
-            ).cast("int"),
-        )
-
-        .withColumn(
-            "monthly_emi",
-            F.col(
-                "monthly_emi"
-            ).cast("double"),
-        )
-
-        .withColumn(
-            "paid_emi",
-            F.col(
-                "paid_emi"
-            ).cast("int"),
-        )
-
-        .withColumn(
-            "remaining_emi",
-            F.col(
-                "remaining_emi"
-            ).cast("int"),
-        )
-
-        .withColumn(
-            "outstanding_balance",
-            F.col(
-                "outstanding_balance"
-            ).cast("double"),
-        )
-
-        .withColumn(
-            "loan_to_income_ratio",
-            F.col(
-                "loan_to_income_ratio"
-            ).cast("double"),
-        )
-
-        .withColumn(
+    if "sanction_date" in df.columns:
+        df = df.withColumn(
             "sanction_date",
-            F.to_date(
-                F.col(
-                    "sanction_date"
-                )
-            ),
+            F.to_date(F.col("sanction_date"))
         )
-    )
 
     return df
 
 
 # ==========================================================
-# VALIDATION
-# ==========================================================
-
-def add_loan_validation(
-    df: DataFrame,
-) -> DataFrame:
-
-    return (
-        df
-
-        .withColumn(
-            "_validation_error",
-
-            F.when(
-                F.col("loan_id").isNull(),
-                "loan_id is NULL",
-            )
-
-            .when(
-                F.col("customer_id").isNull(),
-                "customer_id is NULL",
-            )
-
-            .when(
-                F.col("branch_id").isNull(),
-                "branch_id is NULL",
-            )
-
-            .when(
-                F.col("loan_amount") < 0,
-                "loan_amount is negative",
-            )
-
-            .when(
-                F.col("interest_rate") < 0,
-                "interest_rate is negative",
-            )
-
-            .when(
-                F.col("tenure_years") <= 0,
-                "tenure_years must be greater than zero",
-            )
-
-            .when(
-                F.col("outstanding_balance") < 0,
-                "outstanding_balance is negative",
-            )
-
-            .when(
-                F.col("outstanding_balance")
-                >
-                F.col("loan_amount"),
-
-                "outstanding_balance exceeds loan amount",
-            )
-
-            .otherwise(
-                F.lit(None)
-            ),
-        )
-
-        .withColumn(
-            "_is_valid",
-            F.col(
-                "_validation_error"
-            ).isNull(),
-        )
-    )
-
-
-# ==========================================================
-# VALID RECORDS
-# ==========================================================
-
-def get_valid_records(
-    df: DataFrame,
-) -> DataFrame:
-
-    return (
-        df
-        .filter(
-            F.col("_is_valid")
-        )
-        .drop(
-            "_validation_error",
-            "_is_valid",
-        )
-    )
-
-
-# ==========================================================
-# QUARANTINE
-# ==========================================================
-
-def get_quarantine_records(
-    df: DataFrame,
-) -> DataFrame:
-
-    return (
-        df
-        .filter(
-            ~F.col("_is_valid")
-        )
-    )
-
-
-# ==========================================================
-# PREPARE LOAN CDC
+# PREPARE CDC
 #
-# SAME PATTERN AS ACCOUNT
+# INPUT:
+#   1. Streaming CDC
+#   2. Static Bronze Loan master
+#
+# OUTPUT:
+#   Complete CDC after-image
 # ==========================================================
 
 def prepare_loan_cdc(
     cdc_df: DataFrame,
-    loan_df: DataFrame,
+    loan_df: DataFrame
 ) -> DataFrame:
 
-    # ======================================================
-    # Clean Master Loan
-    # ======================================================
+    # ------------------------------------------------------
+    # Clean static master
+    # ------------------------------------------------------
 
-    loan_df = (
-        transform_loan(
-            loan_df
-        )
-        .select(
-            *LOAN_COLUMNS
-        )
-        .dropDuplicates(
-            ["loan_id"]
-        )
+    master = (
+        transform_loan(loan_df)
+        .select(*LOAN_COLUMNS)
+        .dropDuplicates(["loan_id"])
     )
 
-    # ======================================================
-    # Normalize CDC Column Names
-    # ======================================================
+    # ------------------------------------------------------
+    # Normalize CDC column names
+    # ------------------------------------------------------
 
-    for column_name in cdc_df.columns:
+    for c in cdc_df.columns:
 
         normalized = (
-            column_name
-            .strip()
+            c.strip()
             .lower()
             .replace(" ", "_")
             .replace("-", "_")
         )
 
-        if normalized != column_name:
-
+        if normalized != c:
             cdc_df = cdc_df.withColumnRenamed(
-                column_name,
-                normalized,
+                c,
+                normalized
             )
 
-    # ======================================================
-    # Normalize CDC Values
-    # ======================================================
+    # ------------------------------------------------------
+    # Normalize CDC fields
+    # ------------------------------------------------------
 
     cdc_df = (
         cdc_df
 
         .withColumn(
             "entity",
-            F.upper(
-                F.trim(
-                    F.col("entity")
-                )
-            ),
+            F.lower(F.trim(F.col("entity")))
         )
 
         .withColumn(
             "operation",
-            F.lower(
-                F.trim(
-                    F.col("operation")
-                )
-            ),
+            F.lower(F.trim(F.col("operation")))
         )
 
         .withColumn(
             "loan_id",
-            F.trim(
-                F.col("loan_id")
-            ),
+            F.trim(F.col("loan_id"))
         )
 
         .withColumn(
             "customer_id",
-            F.trim(
-                F.col("customer_id")
-            ),
+            F.trim(F.col("customer_id"))
         )
 
         .withColumn(
             "batch_id",
-            F.trim(
-                F.col("batch_id")
-            ),
+            F.trim(F.col("batch_id"))
         )
 
         .withColumn(
             "event_id",
-            F.trim(
-                F.col("event_id")
-            ),
+            F.trim(F.col("event_id"))
+        )
+
+        .withColumn(
+            "new_balance",
+            F.col("new_balance").cast("double")
+        )
+
+        .withColumn(
+            "new_status",
+            F.upper(F.trim(F.col("new_status")))
         )
 
         .withColumn(
             "event_timestamp",
-            F.to_timestamp(
-                F.col("event_timestamp")
-            ),
+            F.to_timestamp(F.col("event_timestamp"))
         )
 
         .withColumn(
             "change_timestamp",
-            F.to_timestamp(
-                F.col("change_timestamp")
-            ),
+            F.to_timestamp(F.col("change_timestamp"))
         )
     )
 
-    # ======================================================
-    # CDC + MASTER JOIN
+    # ------------------------------------------------------
+    # STREAM + STATIC JOIN
     #
-    # IMPORTANT:
-    # loan_df is STATIC.
-    # cdc_df is STREAMING.
-    # ======================================================
+    # CDC = STREAM
+    # MASTER = STATIC
+    # ------------------------------------------------------
 
-    joined_df = (
-
+    joined = (
         cdc_df.alias("cdc")
-
         .join(
-            loan_df.alias("loan"),
-
-            F.col(
-                "cdc.loan_id"
-            )
-            ==
-            F.col(
-                "loan.loan_id"
-            ),
-
-            "left",
+            master.alias("loan"),
+            F.col("cdc.loan_id") ==
+            F.col("loan.loan_id"),
+            "left"
         )
     )
 
-    # ======================================================
-    # COMPLETE CDC RECORD
-    # ======================================================
+    # ------------------------------------------------------
+    # COMPLETE AFTER IMAGE
+    # ------------------------------------------------------
 
-    return joined_df.select(
+    return joined.select(
 
-        # --------------------------------------------------
-        # Loan Business Columns
-        # --------------------------------------------------
-
-        F.col(
-            "cdc.loan_id"
-        ).alias(
-            "loan_id"
-        ),
+        F.col("cdc.loan_id").alias("loan_id"),
 
         F.coalesce(
-            F.col(
-                "cdc.customer_id"
-            ),
-            F.col(
-                "loan.customer_id"
-            ),
-        ).alias(
-            "customer_id"
-        ),
+            F.col("cdc.customer_id"),
+            F.col("loan.customer_id")
+        ).alias("customer_id"),
 
-        F.col(
-            "loan.branch_id"
-        ).alias(
-            "branch_id"
-        ),
+        F.col("loan.branch_id").alias("branch_id"),
 
-        F.col(
-            "loan.loan_type"
-        ).alias(
-            "loan_type"
-        ),
+        F.col("loan.loan_type").alias("loan_type"),
 
-        F.col(
-            "loan.loan_amount"
-        ).alias(
-            "loan_amount"
-        ),
+        F.col("loan.loan_amount").alias("loan_amount"),
 
-        F.col(
-            "loan.interest_rate"
-        ).alias(
-            "interest_rate"
-        ),
+        F.col("loan.interest_rate").alias("interest_rate"),
 
-        F.col(
-            "loan.tenure_years"
-        ).alias(
-            "tenure_years"
-        ),
+        F.col("loan.tenure_years").alias("tenure_years"),
 
-        F.col(
-            "loan.monthly_emi"
-        ).alias(
-            "monthly_emi"
-        ),
+        F.col("loan.monthly_emi").alias("monthly_emi"),
 
-        F.col(
-            "loan.paid_emi"
-        ).alias(
-            "paid_emi"
-        ),
+        F.col("loan.paid_emi").alias("paid_emi"),
 
-        F.col(
-            "loan.remaining_emi"
-        ).alias(
-            "remaining_emi"
-        ),
-
-        # --------------------------------------------------
-        # CDC-controlled balance
-        # --------------------------------------------------
+        F.col("loan.remaining_emi").alias("remaining_emi"),
 
         F.coalesce(
-            F.col(
-                "cdc.new_balance"
-            ).cast("double"),
-
-            F.col(
-                "loan.outstanding_balance"
-            ),
-        ).alias(
-            "outstanding_balance"
-        ),
+            F.col("cdc.new_balance"),
+            F.col("loan.outstanding_balance")
+        ).alias("outstanding_balance"),
 
         F.col(
             "loan.loan_to_income_ratio"
-        ).alias(
-            "loan_to_income_ratio"
-        ),
+        ).alias("loan_to_income_ratio"),
 
-        F.col(
-            "loan.sanction_date"
-        ).alias(
-            "sanction_date"
-        ),
-
-        # --------------------------------------------------
-        # CDC-controlled status
-        # --------------------------------------------------
+        F.col("loan.sanction_date").alias("sanction_date"),
 
         F.coalesce(
-            F.upper(
-                F.trim(
-                    F.col(
-                        "cdc.new_status"
-                    )
-                )
-            ),
+            F.col("cdc.new_status"),
+            F.col("loan.status")
+        ).alias("status"),
 
-            F.col(
-                "loan.status"
-            ),
-        ).alias(
-            "status"
-        ),
+        # CDC metadata
+        F.col("cdc.operation").alias("_operation"),
 
-        # --------------------------------------------------
-        # CDC Metadata
-        # --------------------------------------------------
+        F.col("cdc.batch_id").alias("_batch_id"),
 
-        F.col(
-            "cdc.operation"
-        ).alias(
-            "_operation"
-        ),
+        F.col("cdc.event_id").alias("_event_id"),
 
-        F.col(
-            "cdc.batch_id"
-        ).alias(
-            "_batch_id"
-        ),
-
-        F.col(
-            "cdc.event_id"
-        ).alias(
-            "_event_id"
-        ),
-
-        F.col(
-            "cdc.entity"
-        ).alias(
-            "_entity"
-        ),
+        F.col("cdc.entity").alias("_entity"),
 
         F.col(
             "cdc.event_timestamp"
-        ).alias(
-            "_event_timestamp"
-        ),
+        ).alias("_event_timestamp"),
 
         F.coalesce(
-            F.col(
-                "cdc.change_timestamp"
-            ),
-            F.col(
-                "cdc.event_timestamp"
-            ),
-        ).alias(
-            "_change_timestamp"
-        ),
+            F.col("cdc.change_timestamp"),
+            F.col("cdc.event_timestamp")
+        ).alias("_change_timestamp"),
     )
