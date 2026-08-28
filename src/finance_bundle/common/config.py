@@ -1,6 +1,3 @@
-import os
-
-
 class Settings:
 
     PROJECT_NAME = "enterprise-banking-platform"
@@ -16,22 +13,21 @@ class Settings:
     # Unity Catalog
     # ==========================================================
     #
-    # The Bundle target can provide FINANCE_CATALOG.
+    # The catalog is NOT defined here.
     #
-    # Example:
+    # The Databricks Bundle / Lakeflow pipeline determines
+    # the catalog through:
     #
-    #   dev-leo    -> finance_catalog_leo
-    #   dev-aish   -> finance_catalog_alj
-    #   prod       -> finance_catalog
+    #     catalog: ${var.catalog}
     #
-    # If FINANCE_CATALOG is not provided, production catalog
-    # is used as the safe fallback.
+    # Therefore:
+    #
+    #     dev-leo  -> finance_catalog_leo
+    #     dev-aish -> finance_catalog_alj
+    #     prod     -> finance_catalog
+    #
+    # Python only needs the schema names.
     # ==========================================================
-
-    CATALOG = os.getenv(
-        "FINANCE_CATALOG",
-        "finance_catalog",
-    )
 
     EXTERNAL_LOCATION = "storage-connector"
 
