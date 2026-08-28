@@ -2,10 +2,19 @@ bundle:
   name: finance_bundle
   uuid: e8599de7-e987-40c2-a71a-d83a9c59d3a7
 
+
+# ==========================================================
+# Includes
+# ==========================================================
+
 include:
+
   - resources/pipelines/*.yml
+
   - resources/jobs/*.yml
+
   - resources/permissions/*.yml
+
   - resources/*/*.yml
 
 
@@ -149,3 +158,69 @@ targets:
       quarantine_schema: quarantine
 
       monitoring_schema: monitoring
+
+    # ------------------------------------------------------
+    # Production Pipeline Overrides
+    # ------------------------------------------------------
+    #
+    # The shared pipeline YAML files use:
+    #
+    #     development: true
+    #
+    # Development targets keep that setting.
+    #
+    # Production overrides it to false.
+    # ------------------------------------------------------
+
+    resources:
+
+      pipelines:
+
+        account_pipeline:
+
+          development: false
+
+
+        atm_transaction_pipeline:
+
+          development: false
+
+
+        branch_pipeline:
+
+          development: false
+
+
+        card_pipeline:
+
+          development: false
+
+
+        customer_pipeline:
+
+          development: false
+
+
+        customer_kyc_pipeline:
+
+          development: false
+
+
+        exchange_rate_pipeline:
+
+          development: false
+
+
+        loan_pipeline:
+
+          development: false
+
+
+        login_activity_pipeline:
+
+          development: false
+
+
+        transaction_pipeline:
+
+          development: false
