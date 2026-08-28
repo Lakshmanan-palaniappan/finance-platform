@@ -4,25 +4,13 @@ from finance_bundle.common.config import settings
 class Catalog:
 
     # ==========================================================
-    # Internal helper
-    # ==========================================================
-
-    @staticmethod
-    def _catalog(catalog=None):
-
-        return catalog or settings.CATALOG
-
-    # ==========================================================
     # Bronze
     # ==========================================================
 
     @staticmethod
-    def bronze(table, catalog=None):
-
-        catalog_name = Catalog._catalog(catalog)
+    def bronze(table):
 
         return (
-            f"{catalog_name}."
             f"{settings.BRONZE_SCHEMA}."
             f"{table}"
         )
@@ -32,12 +20,9 @@ class Catalog:
     # ==========================================================
 
     @staticmethod
-    def silver(table, catalog=None):
-
-        catalog_name = Catalog._catalog(catalog)
+    def silver(table):
 
         return (
-            f"{catalog_name}."
             f"{settings.SILVER_SCHEMA}."
             f"{table}"
         )
@@ -47,12 +32,9 @@ class Catalog:
     # ==========================================================
 
     @staticmethod
-    def gold(table, catalog=None):
-
-        catalog_name = Catalog._catalog(catalog)
+    def gold(table):
 
         return (
-            f"{catalog_name}."
             f"{settings.GOLD_SCHEMA}."
             f"{table}"
         )
@@ -62,12 +44,9 @@ class Catalog:
     # ==========================================================
 
     @staticmethod
-    def monitoring(table, catalog=None):
-
-        catalog_name = Catalog._catalog(catalog)
+    def monitoring(table):
 
         return (
-            f"{catalog_name}."
             f"{settings.MONITORING_SCHEMA}."
             f"{table}"
         )
@@ -77,12 +56,9 @@ class Catalog:
     # ==========================================================
 
     @staticmethod
-    def quarantine(table, catalog=None):
-
-        catalog_name = Catalog._catalog(catalog)
+    def quarantine(table):
 
         return (
-            f"{catalog_name}."
             f"{settings.QUARANTINE_SCHEMA}."
             f"{table}"
         )
