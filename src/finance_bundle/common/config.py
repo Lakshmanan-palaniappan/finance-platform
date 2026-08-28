@@ -1,3 +1,6 @@
+import os
+
+
 class Settings:
 
     PROJECT_NAME = "enterprise-banking-platform"
@@ -12,8 +15,23 @@ class Settings:
     # ==========================================================
     # Unity Catalog
     # ==========================================================
+    #
+    # The Bundle target can provide FINANCE_CATALOG.
+    #
+    # Example:
+    #
+    #   dev-leo    -> finance_catalog_leo
+    #   dev-aish   -> finance_catalog_alj
+    #   prod       -> finance_catalog
+    #
+    # If FINANCE_CATALOG is not provided, production catalog
+    # is used as the safe fallback.
+    # ==========================================================
 
-    CATALOG = "finance_catalog"
+    CATALOG = os.getenv(
+        "FINANCE_CATALOG",
+        "finance_catalog",
+    )
 
     EXTERNAL_LOCATION = "storage-connector"
 
@@ -32,7 +50,8 @@ class Settings:
     AUTOLOADER = "cloudFiles"
 
     # IMPORTANT:
-    # Do NOT use .schema(loan_schema) together with this.
+    # Do NOT use .schema(<explicit_schema>) together with this
+    # unless the particular ingestion implementation requires it.
     SCHEMA_EVOLUTION = "addNewColumns"
 
     # ==========================================================

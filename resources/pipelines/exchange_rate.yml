@@ -1,4 +1,5 @@
 resources:
+
   pipelines:
 
     exchange_rate_pipeline:
@@ -17,17 +18,29 @@ resources:
 
       libraries:
 
+        # --------------------------------------------------
+        # Bronze
+        # --------------------------------------------------
+
         - file:
             path: ../../src/finance_bundle/bronze/exchange_rate/exchange_rate_pipeline.py
+
+        # --------------------------------------------------
+        # Silver
+        # --------------------------------------------------
 
         - file:
             path: ../../src/finance_bundle/silver/exchange_rate/exchange_rate_pipeline.py
 
-        # # Add this later when Exchange Rate Gold is created
+        # --------------------------------------------------
+        # Gold
+        # --------------------------------------------------
+
         - file:
             path: ../../src/finance_bundle/gold/exchange_rate/exchange_rate_pipeline.py
 
       environment:
 
         dependencies:
+
           - ${workspace.artifact_path}/.internal/finance_bundle-0.0.9-py3-none-any.whl

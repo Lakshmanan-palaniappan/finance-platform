@@ -32,9 +32,9 @@ resources:
         - file:
             path: ../../src/finance_bundle/silver/customer_kyc/customer_kyc_pipeline.py
 
-        # # --------------------------------------------------
-        # # Gold
-        # # --------------------------------------------------
+        # --------------------------------------------------
+        # Gold
+        # --------------------------------------------------
 
         - file:
             path: ../../src/finance_bundle/gold/customer_kyc/customer_kyc_pipeline.py

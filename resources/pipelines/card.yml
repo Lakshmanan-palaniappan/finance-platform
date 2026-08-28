@@ -1,4 +1,5 @@
 resources:
+
   pipelines:
 
     card_pipeline:
@@ -17,11 +18,23 @@ resources:
 
       libraries:
 
+        # --------------------------------------------------
+        # Bronze
+        # --------------------------------------------------
+
         - file:
             path: ../../src/finance_bundle/bronze/card/card_pipeline.py
 
+        # --------------------------------------------------
+        # Silver
+        # --------------------------------------------------
+
         - file:
             path: ../../src/finance_bundle/silver/card/card_pipeline.py
+
+        # --------------------------------------------------
+        # Gold
+        # --------------------------------------------------
 
         - file:
             path: ../../src/finance_bundle/gold/card/card_pipeline.py
@@ -29,4 +42,5 @@ resources:
       environment:
 
         dependencies:
+
           - ${workspace.artifact_path}/.internal/finance_bundle-0.0.9-py3-none-any.whl
