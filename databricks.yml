@@ -8,14 +8,36 @@ include:
   - resources/permissions/*.yml
   - resources/*/*.yml
 
+
+# ==========================================================
+# Python Artifact
+# ==========================================================
+
 artifacts:
+
   python_artifact:
+
     type: whl
+
     build: uv build --wheel
 
+
+# ==========================================================
+# Bundle Variables
+# ==========================================================
+
 variables:
+
+  # --------------------------------------------------------
+  # Unity Catalog
+  # --------------------------------------------------------
+
   catalog:
     description: Unity Catalog name
+
+  # --------------------------------------------------------
+  # Schemas
+  # --------------------------------------------------------
 
   bronze_schema:
     description: Bronze schema
@@ -26,25 +48,55 @@ variables:
   gold_schema:
     description: Gold schema
 
+  quarantine_schema:
+    description: Quarantine schema
+
   monitoring_schema:
     description: Monitoring schema
 
+
+# ==========================================================
+# Targets
+# ==========================================================
+
 targets:
+
+
+  # ========================================================
+  # Leo Development
+  # ========================================================
+
   dev-leo:
+
     default: true
+
     mode: development
 
     workspace:
+
       host: https://adb-7405611543404339.19.azuredatabricks.net
+
       root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}/
 
     variables:
+
       catalog: finance_catalog_leo
+
       bronze_schema: bronze
+
       silver_schema: silver
+
       gold_schema: gold
+
+      quarantine_schema: quarantine
+
       monitoring_schema: monitoring
-  
+
+
+  # ========================================================
+  # Aish Development
+  # ========================================================
+
   dev-aish:
 
     mode: development
@@ -65,18 +117,35 @@ targets:
 
       gold_schema: gold
 
+      quarantine_schema: quarantine
+
       monitoring_schema: monitoring
 
+
+  # ========================================================
+  # Production
+  # ========================================================
+
   prod:
+
     mode: production
 
     workspace:
+
       host: https://adb-7405611543404339.19.azuredatabricks.net
+
       root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}/
 
     variables:
+
       catalog: finance_catalog
+
       bronze_schema: bronze
+
       silver_schema: silver
+
       gold_schema: gold
+
+      quarantine_schema: quarantine
+
       monitoring_schema: monitoring

@@ -1,4 +1,5 @@
 resources:
+
   pipelines:
 
     loan_pipeline:
@@ -17,19 +18,29 @@ resources:
 
       libraries:
 
+        # --------------------------------------------------
+        # Bronze
+        # --------------------------------------------------
+
         - file:
             path: ../../src/finance_bundle/bronze/loan/loan_pipeline.py
 
+        # --------------------------------------------------
+        # Silver
+        # --------------------------------------------------
+
         - file:
             path: ../../src/finance_bundle/silver/loan/loan_pipeline.py
-          
+
+        # --------------------------------------------------
+        # Gold
+        # --------------------------------------------------
+
         - file:
-           path: ../../src/finance_bundle/gold/loan/loan_pipeline.py
-
-
-    
+            path: ../../src/finance_bundle/gold/loan/loan_pipeline.py
 
       environment:
 
         dependencies:
+
           - ${workspace.artifact_path}/.internal/finance_bundle-0.0.9-py3-none-any.whl

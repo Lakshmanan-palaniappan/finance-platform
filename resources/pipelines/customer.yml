@@ -1,4 +1,5 @@
 resources:
+
   pipelines:
 
     customer_pipeline:
@@ -17,11 +18,23 @@ resources:
 
       libraries:
 
+        # --------------------------------------------------
+        # Bronze
+        # --------------------------------------------------
+
         - file:
             path: ../../src/finance_bundle/bronze/customer/customer_pipeline.py
 
+        # --------------------------------------------------
+        # Silver
+        # --------------------------------------------------
+
         - file:
             path: ../../src/finance_bundle/silver/customer/customer_pipeline.py
+
+        # --------------------------------------------------
+        # Gold
+        # --------------------------------------------------
 
         - file:
             path: ../../src/finance_bundle/gold/customer360/customer360_pipeline.py
@@ -29,4 +42,5 @@ resources:
       environment:
 
         dependencies:
+
           - ${workspace.artifact_path}/.internal/finance_bundle-0.0.9-py3-none-any.whl
